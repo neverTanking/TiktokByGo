@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const DSN = "root:@tcp(localhost:3306)/tiktok?charset=utf8&parseTime=True&loc=Local"
+var DSN = mysqlUrl(Database["user"], Database["password"], Database["db_name"])
 
 var DB *gorm.DB
 
@@ -19,4 +19,8 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func mysqlUrl(user string, pwd string, db_name string) string {
+	return user + ":" + pwd + "@tcp(localhost:3306)/" + db_name + "?charset=utf8&parseTime=True&loc=Local"
 }
