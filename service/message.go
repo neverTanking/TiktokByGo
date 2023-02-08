@@ -3,10 +3,11 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/RaymondCode/simple-demo/controller"
 	"io"
 	"net"
 	"sync"
+
+	"github.com/neverTanking/TiktokByGo/controller"
 )
 
 var chatConnMap = sync.Map{}
