@@ -16,6 +16,7 @@ var jwtKey = []byte("uuuuuu")
 var cnt = 0
 
 type MyClaims struct {
+	UserId   int64
 	UserName string
 	PassWord string
 	jwt.StandardClaims
@@ -23,10 +24,11 @@ type MyClaims struct {
 
 // GetToken从username和password变成Token
 
-func GetToken(username string, password string) (string, error) {
+func GetToken(userid int64, username string, password string) (string, error) {
 	cnt++
 	//创建一个我们自己的声明
 	myClaims := &MyClaims{
+		UserId:   userid,
 		UserName: username,
 		PassWord: password,
 		StandardClaims: jwt.StandardClaims{
@@ -118,6 +120,7 @@ func JWTMiddleware() gin.HandlerFunc {
 				"token正确",
 			})
 		}
+		c.Set("UserId", claim.UserId)
 		c.Set("UserName", claim.UserName)
 		c.Set("UserPassword", claim.PassWord)
 		c.Next()
