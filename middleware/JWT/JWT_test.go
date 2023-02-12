@@ -7,9 +7,10 @@ import (
 
 // 测试从username和password变成tokenstr
 func TestGetToken(t *testing.T) {
+	userid := int64(10098)
 	username := "xiaoming"
 	password := "mnlk9022p"
-	tokenStr, err := GetToken(username, password)
+	tokenStr, err := GetToken(userid, username, password)
 	if err != nil {
 		fmt.Println("Test GetToken Failed:", err)
 		return
@@ -21,7 +22,7 @@ func TestGetToken(t *testing.T) {
 		fmt.Println("Test TokenToClaim Failed")
 		return
 	}
-	fmt.Println(claim.UserName, claim.PassWord)
+	fmt.Println(claim.UserId, claim.UserName, claim.PassWord)
 }
 
 //JWTMiddleware用apifox测
