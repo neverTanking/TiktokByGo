@@ -4,45 +4,19 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"sync/atomic"
 
 	"github.com/gin-gonic/gin"
+	"github.com/neverTanking/TiktokByGo/model"
 )
 
-// usersLoginInfo use map to store user info, and key is username+password for demo
-// user data will be cleared every time the server starts
-// test data: username=zhanglei, password=douyin
-// var usersLoginInfo = map[string]User{
-// 	"zhangleidouyin": {
-// 		Id:            1,
-// 		Name:          "zhanglei",
-// 		FollowCount:   10,
-// 		FollowerCount: 5,
-// 		IsFollow:      true,
-// 	},
-// }
-
-// userId -> user
-var usersDate = map[int64]User{
-	1: {
-		Id:            1,
-		Name:          "zhanglei",
-		FollowCount:   10,
-		FollowerCount: 5,
-		IsFollow:      true,
-	},
-}
-
-// TODO token -> user id
-var usersLoginInfo = map[string]int64{
+// token -> user_id
+var UsersLoginInfo = map[string]int64{
 	"zhanglei---douyin": 1,
 }
 
-var userIdSequence = int64(1)
-
 type UserLoginResponse struct {
 	Response
-	UserId int64  `json:"user_id,omitempty"`
+	UserId uint   `json:"user_id,omitempty"`
 	Token  string `json:"token"`
 }
 
@@ -59,46 +33,33 @@ type UserResponse struct {
  */
 func createToken(username string, password string) string {
 	// TODO 加密
-	return username +"---"+ password
+	return strings.Join([]string{username, password}, "---")
 }
 
 func decodeToken(token string) ([]string, error) {
 	// TODO 解密
-	res:=strings.Split(token, "---")
+	res := strings.Split(token, "---")
 	return res, nil
 }
 
 /**
- * @description: 计算用户id，改变内存中的id，返回计算后的id
- * @param {*int64} id 当前id值
- * @return {*} int64 计算后的id
- */
-func calcUserId(id *int64) int64 {
-	// TODO 计算id
-	return atomic.AddInt64(id, 1)
-}
-
-/**
  * @description: 获取用户信息
- * @param {int64} id	用户id
+ * @param {uint} id	用户id
  * @return {*}	用户信息
  */
-func getUserInfo(id int64) User {
-	return usersDate[id]
+func getUserInfo(id uint) User {
+	user := model.SearchUser(id)
+	return user
 }
 
 /**
  * @description: 创建新用户，并存储
- * @param {int64} id 用户id
+ * @param {uint} id 用户id
  * @param {string} name 用户名
  * @param {string} password 用户密码
  */
-func newUser(id int64, name string, password string) {
-	usersDate[id] = User{
-		Id:   id,
-		Name: name,
-	}
-	usersLoginInfo[name+password] = id
+func newUser(name string, password string) bool {
+	return model.CreatUser(name, password)
 }
 
 func searchUser(username string) (User, bool) {
@@ -149,8 +110,7 @@ func Register(c *gin.Context) {
 		// verifyPassword(password, user.Password)
 	}
 	// 3.2 不存在则创建用户，并返回用户信息
-	id := calcUserId(&userIdSequence)
-	newUser(id, username, password)
+	model.CreatUser(username, password)
 	token := createToken(username, password)
 	c.JSON(http.StatusOK, UserLoginResponse{
 		Response: Response{StatusCode: Success, StatusMsg: SignUpOk},
@@ -239,7 +199,7 @@ func UserInfo(c *gin.Context) {
 		Response: Response{StatusCode: Success},
 		User:     user,
 	})
-	// if user, exist := usersDate[user_id.(int64)]; exist {
+	// if user, exist := usersDate[user_id.(uint)]; exist {
 	// 	c.JSON(http.StatusOK, UserResponse{
 	// 		Response: Response{StatusCode: Success},
 	// 		User:     user,
