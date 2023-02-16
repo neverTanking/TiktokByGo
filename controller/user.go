@@ -16,7 +16,7 @@ var UsersLoginInfo = map[string]int64{
 
 type UserLoginResponse struct {
 	model.Response
-	UserId uint   `json:"user_id,omitempty"`
+	UserId int64  `json:"user_id,omitempty"`
 	Token  string `json:"token"`
 }
 
@@ -44,21 +44,21 @@ func decodeToken(token string) ([]string, error) {
 
 /**
  * @description: 获取用户信息
- * @param {uint} id	用户id
+ * @param {int64} id	用户id
  * @return {*}	用户信息
  */
-func getUserInfo(id uint) model.User {
+func getUserInfo(id int64) model.User {
 	user := model.SearchUser(id)
 	return user
 }
 
 /**
  * @description: 创建新用户，并存储
- * @param {uint} id 用户id
+ * @param {int64} id 用户id
  * @param {string} name 用户名
  * @param {string} password 用户密码
  */
-func newUser(name string, password string) bool {
+func newUser(name string, password string) int64 {
 	return model.CreatUser(name, password)
 }
 
@@ -105,7 +105,7 @@ func Register(c *gin.Context) {
 		// verifyPassword(password, user.Password)
 	}
 	// 3.2 不存在则创建用户，并返回用户信息
-	model.CreatUser(username, password)
+	id := model.CreatUser(username, password)
 	token := createToken(username, password)
 	c.JSON(http.StatusOK, UserLoginResponse{
 		Response: model.Response{StatusCode: Success, StatusMsg: SignUpOk},
@@ -194,7 +194,7 @@ func UserInfo(c *gin.Context) {
 		Response: model.Response{StatusCode: Success},
 		User:     user,
 	})
-	// if user, exist := usersDate[user_id.(uint)]; exist {
+	// if user, exist := usersDate[user_id.(int64)]; exist {
 	// 	c.JSON(http.StatusOK, UserResponse{
 	// 		Response: Response{StatusCode: Success},
 	// 		User:     user,
