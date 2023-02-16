@@ -1,12 +1,17 @@
 package model
 
 import (
-	"github.com/neverTanking/TiktokByGo/controller"
 	"github.com/neverTanking/TiktokByGo/db"
 )
 
 var user db.User
 
+/**
+ * @description: 创建用户
+ * @param {string} username
+ * @param {string} password
+ * @return {*} user_id
+ */
 func CreatUser(username string, password string) int64 {
 	user = db.User{
 		Name:     username,
@@ -19,12 +24,12 @@ func CreatUser(username string, password string) int64 {
 	return user.ID
 }
 
-func SearchUser(id int64) controller.User {
+func SearchUser(id int64) User {
 	res := db.DB.Find(&user)
 	if res.Error != nil {
-		return controller.User{}
+		return User{}
 	}
-	return controller.User{
+	return User{
 		Id:            id,
 		Name:          user.Name,
 		FollowCount:   0,

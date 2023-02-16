@@ -15,14 +15,14 @@ var UsersLoginInfo = map[string]int64{
 }
 
 type UserLoginResponse struct {
-	Response
+	model.Response
 	UserId uint   `json:"user_id,omitempty"`
 	Token  string `json:"token"`
 }
 
 type UserResponse struct {
-	Response
-	User User `json:"user"`
+	model.Response
+	User model.User `json:"user"`
 }
 
 /**
@@ -47,7 +47,7 @@ func decodeToken(token string) ([]string, error) {
  * @param {uint} id	用户id
  * @return {*}	用户信息
  */
-func getUserInfo(id uint) User {
+func getUserInfo(id uint) model.User {
 	user := model.SearchUser(id)
 	return user
 }
@@ -62,13 +62,8 @@ func newUser(name string, password string) bool {
 	return model.CreatUser(name, password)
 }
 
-func searchUser(username string) (User, bool) {
-	for _, user := range usersDate {
-		if user.Name == username {
-			return user, true
-		}
-	}
-	return User{}, false
+func searchUser(username string) (model.User, bool) {
+	return model.User{}, false
 }
 
 // 验证密码
@@ -84,11 +79,11 @@ func AuthMiddleware(c *gin.Context) {
 	// 获取token
 	token := c.Query("token")
 	// 验证token
-	if _, exist := usersLoginInfo[token]; exist {
+	if _, exist := UsersLoginInfo[token]; exist {
 		c.Next()
 	} else {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: Fail, StatusMsg: NotLogin},
+			Response: model.Response{StatusCode: Fail, StatusMsg: NotLogin},
 		})
 		c.Abort()
 	}
@@ -113,14 +108,14 @@ func Register(c *gin.Context) {
 	model.CreatUser(username, password)
 	token := createToken(username, password)
 	c.JSON(http.StatusOK, UserLoginResponse{
-		Response: Response{StatusCode: Success, StatusMsg: SignUpOk},
+		Response: model.Response{StatusCode: Success, StatusMsg: SignUpOk},
 		UserId:   id,
 		Token:    token,
 	})
 
 	// token := createToken(username, password)
 
-	// if _, exist := usersLoginInfo[token]; exist {
+	// if _, exist := UsersLoginInfo[token]; exist {
 	// 	c.JSON(http.StatusOK, UserLoginResponse{
 	// 		Response: Response{StatusCode: Fail, StatusMsg: Existed},
 	// 	})
@@ -151,7 +146,7 @@ func Login(c *gin.Context) {
 	user, exist := searchUser(username)
 	if !exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: Fail, StatusMsg: NotExisted},
+			Response: model.Response{StatusCode: Fail, StatusMsg: NotExisted},
 		})
 		return
 	}
@@ -165,16 +160,16 @@ func Login(c *gin.Context) {
 
 	// 4. 生成token，存储在服务器
 	token := createToken(username, password)
-	usersLoginInfo[token] = user.Id // 服务器存储token
+	UsersLoginInfo[token] = user.Id // 服务器存储token
 
 	// 5. 返回用户信息和token
 	c.JSON(http.StatusOK, UserLoginResponse{
-		Response: Response{StatusCode: Success},
+		Response: model.Response{StatusCode: Success},
 		UserId:   user.Id,
 		Token:    token,
 	})
 
-	// if user, exist := usersLoginInfo[token]; exist {
+	// if user, exist := UsersLoginInfo[token]; exist {
 	// 	c.JSON(http.StatusOK, UserLoginResponse{
 	// 		Response: Response{StatusCode: Success},
 	// 		UserId:   user.Id,
@@ -196,7 +191,7 @@ func UserInfo(c *gin.Context) {
 
 	user := getUserInfo(user_id)
 	c.JSON(http.StatusOK, UserResponse{
-		Response: Response{StatusCode: Success},
+		Response: model.Response{StatusCode: Success},
 		User:     user,
 	})
 	// if user, exist := usersDate[user_id.(uint)]; exist {
