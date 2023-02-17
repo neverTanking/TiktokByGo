@@ -7,7 +7,7 @@ import (
 
 // 测试从username和password变成tokenstr
 func TestGetToken(t *testing.T) {
-	userid := int64(10098)
+	userid := uint(10098)
 	username := "xiaoming"
 	password := "mnlk9022p"
 	tokenStr, err := GetToken(userid, username, password)

@@ -3,10 +3,13 @@ package main
 import (
 	"github.com/RaymondCode/simple-demo/service"
 	"github.com/gin-gonic/gin"
+	"github.com/neverTanking/TiktokByGo/cache/Redis"
 	"github.com/neverTanking/TiktokByGo/router"
 )
 
 func main() {
+	defer Redis.Rdb.Close()
+	
 	go service.RunMessageServer()
 
 	r := gin.Default()

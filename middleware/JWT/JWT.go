@@ -16,7 +16,7 @@ var jwtKey = []byte("uuuuuu")
 var cnt = 0
 
 type MyClaims struct {
-	UserId   int64
+	UserId   uint
 	UserName string
 	PassWord string
 	jwt.StandardClaims
@@ -24,7 +24,7 @@ type MyClaims struct {
 
 // GetToken从username和password变成Token
 
-func GetToken(userid int64, username string, password string) (string, error) {
+func GetToken(userid uint, username string, password string) (string, error) {
 	cnt++
 	//创建一个我们自己的声明
 	myClaims := &MyClaims{
@@ -114,12 +114,15 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 		//apifox测试用，后面补充完，要删掉，因为后面还有response
-		{
-			c.JSON(http.StatusOK, db.CommonResponse{
-				config.SUCCESS,
-				"token正确",
-			})
-		}
+		/*
+			{
+				c.JSON(http.StatusOK, db.CommonResponse{
+					config.SUCCESS,
+					"token正确",
+				})
+			}
+		*/
+
 		c.Set("UserId", claim.UserId)
 		c.Set("UserName", claim.UserName)
 		c.Set("UserPassword", claim.PassWord)

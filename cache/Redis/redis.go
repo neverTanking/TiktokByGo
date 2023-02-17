@@ -5,27 +5,42 @@ import (
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"github.com/neverTanking/TiktokByGo/config"
+	"sync"
 )
 
 var Rdb *redis.Client
 var ctx = context.Background()
 var LIKE = "like"
 
-func InitClientRdb() (err error) {
+type RedisDao struct {
+}
+
+var (
+	redisDao  *RedisDao
+	redisOnce sync.Once
+)
+
+func NewRedisDao() *RedisDao {
+	redisOnce.Do(func() {
+		redisDao = new(RedisDao)
+		InitClientRdb()
+	})
+	return redisDao
+}
+
+func InitClientRdb() {
 	Rdb = redis.NewClient(&redis.Options{
 		Addr:     config.RedisAddr,
 		Password: config.RedisPassword,
 		DB:       config.RedisDB,
 	})
 	if err := Rdb.Ping(ctx).Err(); err != nil {
-		return err
-	} else {
-		return nil
+		panic(err)
 	}
 }
 
 // 点赞，更新喜欢列表，喜欢列表是所有点赞的视频
-func UpdatePostLike(user_id int64, vedio_id int64, state bool) error {
+func (u *RedisDao) UpdatePostLike(user_id uint, vedio_id uint, state bool) error {
 	str_key := fmt.Sprintf("%s-%d", LIKE, user_id)
 	if state {
 		if err := Rdb.SAdd(ctx, str_key, vedio_id).Err(); err != nil {
@@ -42,7 +57,7 @@ func UpdatePostLike(user_id int64, vedio_id int64, state bool) error {
 }
 
 // 查询用户对该视频是否点赞
-func GetLikeState(user_id int64, vedio_id int64) (bool, error) {
+func (u *RedisDao) GetLikeState(user_id uint, vedio_id uint) (bool, error) {
 	str_key := fmt.Sprintf("%s-%d", LIKE, user_id)
 	ok, err := Rdb.SIsMember(ctx, str_key, vedio_id).Result()
 	if err != nil {
