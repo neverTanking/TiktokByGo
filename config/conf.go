@@ -19,3 +19,11 @@ var (
 
 // MySql
 var ()
+
+// minio
+var (
+	miniourl       = "192.168.199.129"
+	minioport      = 9000
+	minioaccessKey = "CEETOJG1955MURS4GKRU"                     //minioadmin
+	miniosecretKey = "f1sPI0nZuept9sp2Ndqu+73vQ+30yeYxEsQ9YfHf" //minioadmin //key
+)
