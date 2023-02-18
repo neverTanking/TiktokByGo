@@ -114,14 +114,13 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 		//apifox测试用，后面补充完，要删掉，因为后面还有response
-		/*
-			{
-				c.JSON(http.StatusOK, db.CommonResponse{
-					config.SUCCESS,
-					"token正确",
-				})
-			}
-		*/
+
+		//{
+		//	c.JSON(http.StatusOK, db.CommonResponse{
+		//		config.SUCCESS,
+		//		"token right",
+		//	})
+		//}
 
 		c.Set("UserId", claim.UserId)
 		c.Set("UserName", claim.UserName)

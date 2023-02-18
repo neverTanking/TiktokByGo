@@ -2,6 +2,7 @@ package video
 
 import (
 	"errors"
+	"fmt"
 	"github.com/neverTanking/TiktokByGo/cache/Redis"
 	db "github.com/neverTanking/TiktokByGo/db/video"
 )
@@ -30,14 +31,28 @@ func NewLikeState(userid uint, videoid uint, actiontype int) *LikeState {
 }
 
 func (u *LikeState) Finish() error {
+
 	if err := u.ParameterValid(); err != nil {
 		return err
 	}
+
+	//测试ParameterVaild正确性
+	//正确
+	/*
+		{
+			fmt.Println("6666666666666666", u.UserId, u.VideoId, u.actionType)
+		}
+	*/
+
 	//因为前面已经判断了,只能是LIKE or UNLIKE
 	if u.actionType == LIKE {
-		u.LikeVideo()
+		if err := u.LikeVideo(); err != nil {
+			return err
+		}
 	} else {
-		u.UnLikeVideo()
+		if err := u.UnLikeVideo(); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -54,16 +69,20 @@ func (u *LikeState) ParameterValid() error {
 
 // 点击喜欢
 func (u *LikeState) LikeVideo() error {
-	if err := db.NewVideoDao().AddOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
-		return err
-	}
+	//需要判断UserId是否存在，VideoId是否存在
+	//需要判断这个是否已经存在
 	ok, err := Redis.NewRedisDao().GetLikeState(u.UserId, u.VideoId)
 	if err != nil {
 		return err
 	}
 	if ok {
+		fmt.Println("ERROR666666666!")
 		return errors.New("you can't like again after you've already liked it")
 	}
+	if err := db.NewVideoDao().AddOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
+		return err
+	}
+
 	if err := Redis.NewRedisDao().UpdatePostLike(u.UserId, u.VideoId, true); err != nil {
 		return err
 	}
@@ -72,15 +91,16 @@ func (u *LikeState) LikeVideo() error {
 
 // 点击取消喜欢
 func (u *LikeState) UnLikeVideo() error {
-	if err := db.NewVideoDao().SubOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
-		return err
-	}
 	ok, err := Redis.NewRedisDao().GetLikeState(u.UserId, u.VideoId)
 	if err != nil {
 		return err
 	}
 	if !ok {
 		return errors.New("you can't cancel like again after you've already dislike it")
+	}
+
+	if err := db.NewVideoDao().SubOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
+		return err
 	}
 	if err := Redis.NewRedisDao().UpdatePostLike(u.UserId, u.VideoId, false); err != nil {
 		return err

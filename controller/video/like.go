@@ -3,6 +3,7 @@ package video
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/neverTanking/TiktokByGo/config"
 	"github.com/neverTanking/TiktokByGo/controller"
 	"github.com/neverTanking/TiktokByGo/db"
 	"github.com/neverTanking/TiktokByGo/service/video"
@@ -26,14 +27,31 @@ func NewLikeController(c *gin.Context) *LikeController {
 }
 
 func (u *LikeController) Finish() {
+
 	//Get Parameter
 	if err := u.ParseParameter(); err != nil {
 		u.ReturnError(err.Error()) //自定义的ErrorString,将err转化成string
 		return
 	}
+
+	// 测试解析出来的参数是否正确
+	//ParseParameter测试通过
+	/*
+		{
+			u.JSON(http.StatusOK, db.CommonResponse{
+				StatusCode: int32(u.actionType),
+				StatusMsg:  config.SUCCESS_MSG,
+			})
+			return
+			u.ReturnError("NO NO NO")
+			return
+		}
+	*/
+
 	//use Parameter
 	if err := video.LikeAction(u.UserId, u.VideoId, u.actionType); err != nil {
 		u.ReturnError(err.Error())
+		return
 	}
 	u.ReturnSuccess()
 }
@@ -71,5 +89,6 @@ func (u *LikeController) ReturnError(message string) {
 func (u *LikeController) ReturnSuccess() {
 	u.JSON(http.StatusOK, db.CommonResponse{
 		StatusCode: controller.Success,
+		StatusMsg:  config.SUCCESS_MSG,
 	})
 }

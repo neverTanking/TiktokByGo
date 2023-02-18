@@ -15,6 +15,8 @@ var LIKE = "like"
 type RedisDao struct {
 }
 
+var ExecRedis bool
+
 var (
 	redisDao  *RedisDao
 	redisOnce sync.Once
@@ -22,6 +24,7 @@ var (
 
 func NewRedisDao() *RedisDao {
 	redisOnce.Do(func() {
+		ExecRedis = true
 		redisDao = new(RedisDao)
 		InitClientRdb()
 	})
