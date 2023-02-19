@@ -5,7 +5,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/neverTanking/TiktokByGo/config"
-	"github.com/neverTanking/TiktokByGo/db"
 	"net/http"
 	"strconv"
 	"time"
@@ -51,7 +50,7 @@ func GetToken(userid uint, username string, password string) (string, error) {
 
 }
 
-// 解析Token变成Claim
+// TokenToClaim 解析Token变成Claim
 func TokenToClaim(tokenStr string) (*MyClaims, bool) {
 	token, _ := jwt.ParseWithClaims(tokenStr, &MyClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
@@ -78,7 +77,8 @@ func JWTMiddleware() gin.HandlerFunc {
 		}
 		//用户不存在
 		if tokenStr == "" {
-			c.JSON(http.StatusOK, db.CommonResponse{
+
+			c.JSON(http.StatusOK, CommonResponse{
 				config.USERNOTFOUND,
 				"用户不存在",
 			})
@@ -89,7 +89,9 @@ func JWTMiddleware() gin.HandlerFunc {
 		claim, ok := TokenToClaim(tokenStr)
 		if !ok {
 			//错误403有很多种情况，最常见的是无权限访问
-			c.JSON(http.StatusOK, db.CommonResponse{
+
+			c.JSON(http.StatusOK, CommonResponse{
+
 				config.TOKENNOTRIGHT,
 				"token不正确",
 			})
@@ -97,16 +99,20 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 		if time.Now().Unix() > claim.ExpiresAt {
-			c.JSON(http.StatusOK, db.CommonResponse{
+
+			c.JSON(http.StatusOK, CommonResponse{
+
 				config.TOKENOUT,
 				"token过期",
 			})
 			c.Abort()
-			//Abort不再执行后面的Handeler
+
+			//Abort不再执行后面的Handler
 			return
 		}
 		if time.Now().Unix() < claim.NotBefore {
-			c.JSON(http.StatusOK, db.CommonResponse{
+			c.JSON(http.StatusOK, CommonResponse{
+
 				config.TOKENOUT,
 				"token还没生效",
 			})
@@ -126,6 +132,8 @@ func JWTMiddleware() gin.HandlerFunc {
 		c.Set("UserName", claim.UserName)
 		c.Set("UserPassword", claim.PassWord)
 		c.Next()
-		//Next继续执行后面的Handeler
+
+		//Next继续执行后面的Handler
+
 	}
 }
