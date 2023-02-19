@@ -1,43 +1,38 @@
 package db
 
-import (
-	"gorm.io/gorm"
-	"time"
-)
+import "gorm.io/gorm"
 
 type Comment struct {
-	MyModel
-	UserID      int64
+	gorm.Model
+	UserID      uint
 	User        User
-	VideoID     int64
+	VideoID     uint
 	CommentText string
 }
 type Like struct {
-	MyModel
-	UserID  int64
-	VideoID int64
+	gorm.Model
+	UserID  uint
+	VideoID uint
 }
 type User struct {
-	MyModel
-	Name     string
-	Password string
+	gorm.Model
+	Name            string `json:"name"`
+	Password        string `json:"password,omitempty"`
+	Avatar          string `json:"avatar"`           // 用户头像
+	BackgroundImage string `json:"background_image"` // 用户个人页顶部大图
+	Signature       string `json:"signature"`        // 个人简介
 
 	Videos []Video
 	Likes  []Like
 }
+
 type Video struct {
-	MyModel
-	UserID   int64
+	gorm.Model
+	UserID   uint
 	PlayUrl  string
 	CoverUrl string
 	Title    string
 
 	Likes    []Like
 	Comments []Comment
-}
-type MyModel struct {
-	ID        int64          `gorm:"primarykey"`
-	CreatedAt time.Time      `gorm:"autoCreateTime"`
-	UpdatedAt time.Time      `gorm:"autoUpdateTime"`
-	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
