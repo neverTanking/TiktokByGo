@@ -2,13 +2,14 @@ package JWT
 
 import (
 	"fmt"
+	"net/http"
+	"strconv"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/neverTanking/TiktokByGo/config"
 	"github.com/neverTanking/TiktokByGo/db"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 var jwtKey = []byte("uuuuuu")

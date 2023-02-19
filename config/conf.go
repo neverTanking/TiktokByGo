@@ -26,4 +26,7 @@ var (
 	MinioaccessKey = "CEETOJG1955MURS4GKRU"                     //minioadmin
 	MiniosecretKey = "f1sPI0nZuept9sp2Ndqu+73vQ+30yeYxEsQ9YfHf" //minioadmin //key
 	HeartbeatTime  = 2 * 60
+
+	BucketName = "short_videos"
+	Location   = "cn-north-1"
 )

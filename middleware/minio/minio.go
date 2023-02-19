@@ -1,4 +1,4 @@
-package minio
+package myminio
 
 import (
 	"log"
@@ -8,7 +8,7 @@ import (
 	"github.com/neverTanking/TiktokByGo/config"
 )
 
-func Init() { //a
+func Init() *minio.Client { //a
 	endpoint := config.Miniourl
 	accessKeyID := config.MinioaccessKey
 	secretAccessKey := config.MiniosecretKey
@@ -20,8 +20,10 @@ func Init() { //a
 		Secure: useSSL,
 	})
 	if err != nil {
-		log.Fatalln(err)
-	}
+		log.Fatalln("创建 MinIO 客户端失败", err)
 
-	log.Printf("%#v\n", minioClient) // minioClient is now set up
+	}
+	log.Printf("创建 MinIO 客户端成功")
+	// minioClient.PutObject()
+	return minioClient
 }

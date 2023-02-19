@@ -3,14 +3,19 @@ module github.com/neverTanking/TiktokByGo
 go 1.19
 
 require (
-	github.com/RaymondCode/simple-demo v0.0.0-20230109111057-5031aee01508
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gavv/httpexpect/v2 v2.8.0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/minio/minio-go v6.0.14+incompatible
 	github.com/stretchr/testify v1.7.0
 	gorm.io/driver/mysql v1.4.5
 	gorm.io/gorm v1.24.4
+)
+
+require (
+	github.com/go-ini/ini v1.67.0 // indirect
+	github.com/mitchellh/go-homedir v1.1.0 // indirect
 )
 
 require (
@@ -39,7 +44,7 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.48 // indirect
+	github.com/minio/minio-go/v7 v7.0.48
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -47,6 +52,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rs/xid v1.4.0 // indirect
 	github.com/sanity-io/litter v1.5.5 // indirect
+	github.com/satori/go.uuid v1.2.0
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
@@ -58,7 +64,7 @@ require (
 	github.com/yalp/jsonpath v0.0.0-20180802001716-5cc68e5049a0 // indirect
 	github.com/yudai/gojsondiff v1.0.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
-	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
+	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
 	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
 	golang.org/x/text v0.3.7 // indirect

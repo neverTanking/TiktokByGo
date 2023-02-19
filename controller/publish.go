@@ -1,9 +1,10 @@
 package controller
 
 import (
-	"fmt"
+	"log"
 	"net/http"
-	"path/filepath"
+	"service"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,46 +16,43 @@ type VideoListResponse struct {
 
 // Publish check token then save upload file to public directory
 func Publish1(c *gin.Context) {
-	token := c.PostForm("token")
-
-	if _, exist := usersLoginInfo[token]; !exist {
-		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
-		return
-	}
-
 	data, err := c.FormFile("data")
+	userId, _ := strconv.ParseInt(c.GetString("userId"), 10, 64)
+	log.Printf("获取到用户id:%v\n", userId)
+	title := c.PostForm("title")
+	log.Printf("获取到视频title:%v\n", title)
 	if err != nil {
+		log.Printf("获取视频流失败:%v", err)
 		c.JSON(http.StatusOK, Response{
 			StatusCode: 1,
 			StatusMsg:  err.Error(),
 		})
 		return
 	}
+	err = service.Publish_up(data, userId, title)
 
-	filename := filepath.Base(data.Filename)
-	user := usersLoginInfo[token]
-	finalName := fmt.Sprintf("%d_%s", user.Id, filename)
-	saveFile := filepath.Join("./public/", finalName)
-	if err := c.SaveUploadedFile(data, saveFile); err != nil {
+	if err != nil {
+		log.Printf("方法videoService.Publish(data, userId) 失败：%v", err)
 		c.JSON(http.StatusOK, Response{
 			StatusCode: 1,
 			StatusMsg:  err.Error(),
 		})
 		return
 	}
+	log.Printf("方法videoService.Publish(data, userId) 成功")
 
 	c.JSON(http.StatusOK, Response{
 		StatusCode: 0,
-		StatusMsg:  finalName + " uploaded successfully",
+		StatusMsg:  "uploaded successfully",
 	})
 }
 
-// PublishList all users have same publish video list
-func PublishList1(c *gin.Context) {
-	c.JSON(http.StatusOK, VideoListResponse{
-		Response: Response{
-			StatusCode: 0,
-		},
-		VideoList: DemoVideos,
-	})
-}
+// // PublishList all users have same publish video list
+// func PublishList1(c *gin.Context) {
+// 	c.JSON(http.StatusOK, VideoListResponse{
+// 		Response: Response{
+// 			StatusCode: 0,
+// 		},
+// 		VideoList: DemoVideos,
+// 	})
+// }
