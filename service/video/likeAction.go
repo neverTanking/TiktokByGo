@@ -2,7 +2,6 @@ package video
 
 import (
 	"errors"
-	"fmt"
 	"github.com/neverTanking/TiktokByGo/cache/Redis"
 	db "github.com/neverTanking/TiktokByGo/db/video"
 )
@@ -58,7 +57,7 @@ func (u *LikeState) Finish() error {
 }
 
 func (u *LikeState) ParameterValid() error {
-	//查询用户是否存在，需要用户组写
+	//根据UserId查询用户是否存在，需要用户组写
 	//...
 	//判断actionType是否合法
 	if u.actionType != LIKE && u.actionType != DISLIKE {
@@ -70,13 +69,13 @@ func (u *LikeState) ParameterValid() error {
 // 点击喜欢
 func (u *LikeState) LikeVideo() error {
 	//需要判断UserId是否存在，VideoId是否存在
-	//需要判断这个是否已经存在
+	//需要判断这个记录是否已经存在
 	ok, err := Redis.NewRedisDao().GetLikeState(u.UserId, u.VideoId)
 	if err != nil {
 		return err
 	}
 	if ok {
-		fmt.Println("ERROR666666666!")
+		//fmt.Println("ERROR666666666!")
 		return errors.New("you can't like again after you've already liked it")
 	}
 	if err := db.NewVideoDao().AddOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
