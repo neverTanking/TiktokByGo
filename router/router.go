@@ -1,11 +1,14 @@
 package router
 
 import (
+	"JWT"
+
 	"github.com/RaymondCode/simple-demo/controller"
 	"github.com/gin-gonic/gin"
 )
 
 func InitRouter(r *gin.Engine) {
+	git
 	// public directory is used to serve static resources
 	r.Static("/static", "./public")
 
@@ -16,7 +19,7 @@ func InitRouter(r *gin.Engine) {
 	apiRouter.GET("/user/", controller.UserInfo)
 	apiRouter.POST("/user/register/", controller.Register)
 	apiRouter.POST("/user/login/", controller.Login)
-	apiRouter.POST("/publish/action/", controller.Publish)
+	apiRouter.POST("/publish/action/", JWT.AuthBody(), controller.Publish)
 	apiRouter.GET("/publish/list/", controller.PublishList)
 
 	// extra apis - I

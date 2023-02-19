@@ -2,9 +2,10 @@ package controller
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"path/filepath"
+
+	"github.com/gin-gonic/gin"
 )
 
 type VideoListResponse struct {
@@ -13,7 +14,7 @@ type VideoListResponse struct {
 }
 
 // Publish check token then save upload file to public directory
-func Publish(c *gin.Context) {
+func Publish1(c *gin.Context) {
 	token := c.PostForm("token")
 
 	if _, exist := usersLoginInfo[token]; !exist {
@@ -49,7 +50,7 @@ func Publish(c *gin.Context) {
 }
 
 // PublishList all users have same publish video list
-func PublishList(c *gin.Context) {
+func PublishList1(c *gin.Context) {
 	c.JSON(http.StatusOK, VideoListResponse{
 		Response: Response{
 			StatusCode: 0,
