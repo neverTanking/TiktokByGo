@@ -1,13 +1,16 @@
-package main
+package router
 
 import (
 	"github.com/RaymondCode/simple-demo/controller"
 	"github.com/gin-gonic/gin"
+	"github.com/neverTanking/TiktokByGo/controller/video"
+	"github.com/neverTanking/TiktokByGo/db"
 )
 
-func initRouter(r *gin.Engine) {
+func InitRouter(r *gin.Engine) *gin.Engine {
 	// public directory is used to serve static resources
-	r.Static("/static", "./public")
+	db.Init()
+	r.Static("/static", "./static")
 
 	apiRouter := r.Group("/douyin")
 
@@ -21,7 +24,7 @@ func initRouter(r *gin.Engine) {
 
 	// extra apis - I
 	apiRouter.POST("/favorite/action/", controller.FavoriteAction)
-	apiRouter.GET("/favorite/list/", controller.FavoriteList)
+	apiRouter.GET("/favorite/list/", video.FavoriteList)
 	apiRouter.POST("/comment/action/", controller.CommentAction)
 	apiRouter.GET("/comment/list/", controller.CommentList)
 
@@ -32,4 +35,5 @@ func initRouter(r *gin.Engine) {
 	apiRouter.GET("/relation/friend/list/", controller.FriendList)
 	apiRouter.GET("/message/chat/", controller.MessageChat)
 	apiRouter.POST("/message/action/", controller.MessageAction)
+	return r
 }
