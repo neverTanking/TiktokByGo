@@ -1,4 +1,4 @@
-package myminio
+package minio
 
 import (
 	"context"
