@@ -3,7 +3,6 @@ package router
 import (
 	"github.com/RaymondCode/simple-demo/controller"
 	"github.com/gin-gonic/gin"
-	"github.com/neverTanking/TiktokByGo/controller/video"
 	"github.com/neverTanking/TiktokByGo/db"
 )
 
@@ -24,7 +23,7 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 
 	// extra apis - I
 	apiRouter.POST("/favorite/action/", controller.FavoriteAction)
-	apiRouter.GET("/favorite/list/", video.FavoriteList)
+	//apiRouter.GET("/favorite/list/", video.FavoriteList)
 	apiRouter.POST("/comment/action/", controller.CommentAction)
 	apiRouter.GET("/comment/list/", controller.CommentList)
 
