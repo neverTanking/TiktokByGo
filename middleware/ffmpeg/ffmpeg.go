@@ -1,10 +1,11 @@
 package ffmpeg
 
 import (
-	"config"
 	"fmt"
 	"log"
 	"time"
+
+	"github.com/neverTanking/TiktokByGo/config"
 
 	"golang.org/x/crypto/ssh"
 )
