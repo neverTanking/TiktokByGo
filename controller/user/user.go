@@ -1,7 +1,8 @@
-package controller
+package user
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/neverTanking/TiktokByGo/controller"
 	"github.com/neverTanking/TiktokByGo/model"
 	"net/http"
 	"strconv"
@@ -61,7 +62,11 @@ func newUser(name string, password string) int64 {
 	return model.CreatUser(name, password)
 }
 
-func searchUser(username string) (model.User, bool) {
+func SearchUserByName(username string) (model.User, bool) {
+	return model.User{}, false
+}
+
+func SearchUserById(userID uint) (model.User, bool) {
 	return model.User{}, false
 }
 
@@ -82,7 +87,7 @@ func AuthMiddleware(c *gin.Context) {
 		c.Next()
 	} else {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: model.Response{StatusCode: Fail, StatusMsg: NotLogin},
+			Response: model.Response{StatusCode: controller.Fail, StatusMsg: controller.NotLogin},
 		})
 		c.Abort()
 	}
@@ -107,7 +112,7 @@ func Register(c *gin.Context) {
 	id := model.CreatUser(username, password)
 	token := createToken(username, password)
 	c.JSON(http.StatusOK, UserLoginResponse{
-		Response: model.Response{StatusCode: Success, StatusMsg: SignUpOk},
+		Response: model.Response{StatusCode: controller.Success, StatusMsg: controller.SignUpOk},
 		UserId:   id,
 		Token:    token,
 	})
@@ -145,7 +150,7 @@ func Login(c *gin.Context) {
 	user, exist := searchUser(username)
 	if !exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: model.Response{StatusCode: Fail, StatusMsg: NotExisted},
+			Response: model.Response{StatusCode: controller.Fail, StatusMsg: controller.NotExisted},
 		})
 		return
 	}
@@ -163,7 +168,7 @@ func Login(c *gin.Context) {
 
 	// 5. 返回用户信息和token
 	c.JSON(http.StatusOK, UserLoginResponse{
-		Response: model.Response{StatusCode: Success},
+		Response: model.Response{StatusCode: controller.Success},
 		UserId:   user.Id,
 		Token:    token,
 	})
@@ -190,7 +195,7 @@ func UserInfo(c *gin.Context) {
 
 	user := getUserInfo(user_id)
 	c.JSON(http.StatusOK, UserResponse{
-		Response: model.Response{StatusCode: Success},
+		Response: model.Response{StatusCode: controller.Success},
 		User:     user,
 	})
 	// if user, exist := usersDate[user_id.(int64)]; exist {
