@@ -1,8 +1,8 @@
 package router
 
 import (
-	"github.com/RaymondCode/simple-demo/controller"
 	"github.com/gin-gonic/gin"
+	"github.com/neverTanking/TiktokByGo/controller"
 	"github.com/neverTanking/TiktokByGo/controller/video"
 	"github.com/neverTanking/TiktokByGo/db"
 	"github.com/neverTanking/TiktokByGo/middleware/JWT"
