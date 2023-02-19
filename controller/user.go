@@ -1,12 +1,10 @@
 package controller
 
 import (
-	"net/http"
-	"strconv"
-	"strings"
-
 	"github.com/gin-gonic/gin"
 	"github.com/neverTanking/TiktokByGo/model"
+	"net/http"
+	"strconv"
 )
 
 // token -> user_id
@@ -25,22 +23,23 @@ type UserResponse struct {
 	User model.User `json:"user"`
 }
 
-/**
- * @description: 创建用户 token
- * @param {string} username 用户名
- * @param {string} password 用户密码
- * @return {string} 生成的 token
- */
-func createToken(username string, password string) string {
-	// TODO 加密
-	return strings.Join([]string{username, password}, "---")
-}
-
-func decodeToken(token string) ([]string, error) {
-	// TODO 解密
-	res := strings.Split(token, "---")
-	return res, nil
-}
+// Can use middleware JWT
+///**
+// * @description: 创建用户 token
+// * @param {string} username 用户名
+// * @param {string} password 用户密码
+// * @return {string} 生成的 token
+// */
+//func createToken(username string, password string) string {
+//	// TODO 加密
+//	return strings.Join([]string{username, password}, "---")
+//}
+//
+//func decodeToken(token string) ([]string, error) {
+//	// TODO 解密
+//	res := strings.Split(token, "---")
+//	return res, nil
+//}
 
 /**
  * @description: 获取用户信息
