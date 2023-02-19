@@ -1,39 +1,56 @@
 package model
 
 import (
+	"errors"
 	"github.com/neverTanking/TiktokByGo/db"
 )
 
-var user db.User
+var curUser db.User
+var fakeUserId uint = 0
+var fakeUser = User{}
 
-/**
- * @description: 创建用户
- * @param {string} username
- * @param {string} password
- * @return {*} user_id
- */
-func CreatUser(username string, password string) int64 {
-	user = db.User{
+func CreatUser(username string, password string) (userID uint, err error) {
+	curUser = db.User{
 		Name:     username,
 		Password: password,
 	}
-	res := db.DB.Create(&user)
+	res := db.DB.Create(&curUser)
 	if res.Error != nil {
-		return -1
+		return fakeUserId, res.Error
 	}
-	return user.ID
+	return curUser.ID, errors.New("no error")
 }
 
-func SearchUser(id int64) User {
-	res := db.DB.Find(&user)
+func SearchUserByID(id uint) (user User, ok bool) {
+	res := db.DB.Find(&curUser, id)
 	if res.Error != nil {
-		return User{}
+		if res.RowsAffected == 0 {
+			return fakeUser, false
+		}
 	}
 	return User{
-		Id:            id,
-		Name:          user.Name,
-		FollowCount:   0,
-		FollowerCount: 0,
-		IsFollow:      false,
+		User:           curUser,
+		FavoriteCount:  0,
+		FollowCount:    0,
+		FollowerCount:  0,
+		TotalFavorited: "",
+		WorkCount:      0,
+	}, true
+
+}
+func SearchUserByName(username string) (user User, ok bool) {
+	res := db.DB.Where("name = ?", username).Find(&curUser)
+	if res.Error != nil {
+		if res.RowsAffected == 0 {
+			return fakeUser, false
+		}
 	}
+	return User{
+		User:           curUser,
+		FavoriteCount:  0,
+		FollowCount:    0,
+		FollowerCount:  0,
+		TotalFavorited: "",
+		WorkCount:      0,
+	}, true
 }
