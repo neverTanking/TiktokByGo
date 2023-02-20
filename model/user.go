@@ -1,7 +1,7 @@
 package model
 
 import (
-	"errors"
+	"fmt"
 	"github.com/neverTanking/TiktokByGo/db"
 )
 
@@ -16,9 +16,9 @@ func CreatUser(username string, password string) (userID uint, err error) {
 	}
 	res := db.DB.Create(&curUser)
 	if res.Error != nil {
-		return fakeUserId, res.Error
+		return fakeUserId, fmt.Errorf("create user %v failed and db error: %v", username, res.Error)
 	}
-	return curUser.ID, errors.New("no error")
+	return curUser.ID, nil
 }
 
 func SearchUserByID(id uint) (user User, ok bool) {
