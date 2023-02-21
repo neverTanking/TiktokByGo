@@ -3,11 +3,13 @@ package minio
 import (
 	"context"
 	"log"
+
 	"mime/multipart"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/neverTanking/TiktokByGo/config"
+	"github.com/neverTanking/TiktokByGo/middleware/ffm"
 )
 
 func Init() (*minio.Client, error) { //a
@@ -24,7 +26,7 @@ func Init() (*minio.Client, error) { //a
 
 	return minioClient, err
 }
-func VideoToMinio(file *multipart.FileHeader, videoname string) error {
+func VideoToMinio(file *multipart.FileHeader, videoname string, imageName string, title string) error {
 	// 初使化 minio client对象
 	minioClient, err := Init()
 	if err != nil {
@@ -56,14 +58,14 @@ func VideoToMinio(file *multipart.FileHeader, videoname string) error {
 		log.Printf("方法file.Open() 失败%v", err)
 		return err
 	}
-
 	log.Printf("方法file.Open() 成功")
-	_, err2 := minioClient.PutObject(bucketName, videoname+".mp4", video, -1, minio.PutObjectOptions{ContentType: "Progress"})
+	_, err = minioClient.PutObject(context.Background(), bucketName, videoname+".mp4", video, -1, minio.PutObjectOptions{ContentType: ""})
 	if err != nil {
 		log.Printf("upload video failed", err)
-		return err2
+		return err
 	}
 
+	ffm.Ffmpeg(minioClient, imageName, videoname)
 	return nil
 
 }

@@ -3,8 +3,10 @@ package controller
 import (
 	"log"
 	"net/http"
-	"service"
+	"path"
 	"strconv"
+	uuid "github.com/satori/go.uuid"
+	"github.com/neverTanking/TiktokByGo/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,6 +19,7 @@ type VideoListResponse struct {
 // Publish check token then save upload file to public directory
 func Publish1(c *gin.Context) {
 	data, err := c.FormFile("data")
+
 	userId, _ := strconv.ParseInt(c.GetString("userId"), 10, 64)
 	log.Printf("获取到用户id:%v\n", userId)
 	title := c.PostForm("title")
@@ -29,7 +32,14 @@ func Publish1(c *gin.Context) {
 		})
 		return
 	}
-	err = service.Publish_up(data, userId, title)
+	//
+	//生成一个uuid作为视频的名字
+	videoName := uuid.NewV4().String()
+	//生成一个uuid作为图片的名字
+	imageName := uuid.NewV4().String()
+	ffmpegdst := path.Join("~/videorepo", videoName+".mp4")
+	c.SaveUploadedFile(data, ffmpegdst)
+	err = service.Publish_up(data, userId, title,videoName,imageName)
 
 	if err != nil {
 		log.Printf("方法videoService.Publish(data, userId) 失败：%v", err)

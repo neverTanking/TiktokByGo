@@ -7,15 +7,9 @@ require (
 	github.com/gavv/httpexpect/v2 v2.8.0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/minio/minio-go v6.0.14+incompatible
 	github.com/stretchr/testify v1.7.0
 	gorm.io/driver/mysql v1.4.5
 	gorm.io/gorm v1.24.4
-)
-
-require (
-	github.com/go-ini/ini v1.67.0 // indirect
-	github.com/mitchellh/go-homedir v1.1.0 // indirect
 )
 
 require (

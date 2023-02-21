@@ -23,10 +23,11 @@ var ()
 // minio
 var (
 	Miniourl       = "192.168.199.129:9000"
-	MinioaccessKey = "CEETOJG1955MURS4GKRU"                     //minioadmin
-	MiniosecretKey = "f1sPI0nZuept9sp2Ndqu+73vQ+30yeYxEsQ9YfHf" //minioadmin //key
+	MinioaccessKey = "62N5uF7SDDD6Bjhq"                 //minioadmin
+	MiniosecretKey = "2z2zqK34guD01OSd2edvm3gR6hZnhdws" //minioadmin //key
 	HeartbeatTime  = 2 * 60
 
-	BucketName = "short_videos"
-	Location   = "cn-north-1"
+	BucketName   = "short_videos"
+	BucketFfmpeg = "Ffmpeg"
+	Location     = "cn-north-1"
 )
