@@ -22,17 +22,17 @@ type User struct {
 	BackgroundImage string `json:"background_image"` // 用户个人页顶部大图
 	Signature       string `json:"signature"`        // 个人简介
 
-	Videos []Video
-	Likes  []Like
+	//Videos []Video
+	//Likes  []Like
 }
 
 type Video struct {
 	gorm.Model
-	UserID   uint
-	PlayUrl  string
-	CoverUrl string
-	Title    string
+	UserID   uint   `json:"user_id"`
+	PlayUrl  string `json:"play_url"`
+	CoverUrl string `json:"cover_url"`
+	Title    string `json:"title"`
 
-	Likes    []Like
-	Comments []Comment
+	//Likes    []Like `json:"likes,omitempty"`
+	//Comments []Comment `json:"comments,omitempty"`
 }

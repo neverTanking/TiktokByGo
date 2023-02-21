@@ -3,7 +3,7 @@ package video
 import (
 	"errors"
 	"github.com/neverTanking/TiktokByGo/cache/Redis"
-	db "github.com/neverTanking/TiktokByGo/db/video"
+	dao "github.com/neverTanking/TiktokByGo/model/dao"
 )
 
 const (
@@ -58,7 +58,10 @@ func (u *LikeState) Finish() error {
 
 func (u *LikeState) ParameterValid() error {
 	//根据UserId查询用户是否存在，需要用户组写
-	//...
+	exists := dao.NewUserInfoDAO().IsUserExistById(int64(u.UserId))
+	if !exists {
+		return errors.New("User Not Exists")
+	}
 	//判断actionType是否合法
 	if u.actionType != LIKE && u.actionType != DISLIKE {
 		return errors.New("actionType illegal")
@@ -78,7 +81,7 @@ func (u *LikeState) LikeVideo() error {
 		//fmt.Println("ERROR666666666!")
 		return errors.New("you can't like again after you've already liked it")
 	}
-	if err := db.NewVideoDao().AddOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
+	if err := dao.NewVideoDAO().AddOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
 		return err
 	}
 
@@ -98,7 +101,7 @@ func (u *LikeState) UnLikeVideo() error {
 		return errors.New("you can't cancel like again after you've already dislike it")
 	}
 
-	if err := db.NewVideoDao().SubOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
+	if err := dao.NewVideoDAO().SubOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
 		return err
 	}
 	if err := Redis.NewRedisDao().UpdatePostLike(u.UserId, u.VideoId, false); err != nil {

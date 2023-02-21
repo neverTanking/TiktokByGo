@@ -15,3 +15,13 @@ type User struct {
 	TotalFavorited string `json:"total_favorited"` // 获赞数量
 	WorkCount      int64  `json:"work_count"`      // 作品数
 }
+
+// 单个视频
+type Video struct {
+	db.Video
+	//db.User
+	//FavoriteCount int64 `json:"favorite_count"`
+	//CommentCount  int64 `json:"comment_count"`
+	IsFavorite bool `json:"is_favorite"`
+	User
+}

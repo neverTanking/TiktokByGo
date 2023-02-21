@@ -6,6 +6,7 @@ import (
 	"github.com/neverTanking/TiktokByGo/controller/video"
 	"github.com/neverTanking/TiktokByGo/db"
 	"github.com/neverTanking/TiktokByGo/middleware/JWT"
+	"github.com/neverTanking/TiktokByGo/middleware/NoAuth"
 )
 
 func InitRouter(r *gin.Engine) *gin.Engine {
@@ -25,7 +26,7 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 
 	// extra apis - I
 	apiRouter.POST("/favorite/action/", JWT.JWTMiddleware(), video.LikeActionController)
-	//apiRouter.GET("/favorite/list/", controller.FavoriteList)
+	apiRouter.GET("/favorite/list/", NoAuth.NoAuthMiddleWare(), video.FavoriteListController)
 	//apiRouter.POST("/comment/action/", controller.CommentAction)
 	//apiRouter.GET("/comment/list/", controller.CommentList)
 	//
