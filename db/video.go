@@ -23,14 +23,6 @@ func (TableVideo) TableName() string {
 	return "videos"
 }
 
-// TableName
-//
-//	将TableVideo映射到videos，
-//	这样我结构体到名字就不需要是Video了，防止和我Service层到结构体名字冲突
-func (TableVideo) TableName() string {
-	return "videos"
-}
-
 // Save 保存视频记录
 func SaveDao(videoName string, imageName string, authorId int64, title string) error {
 	var video TableVideo
