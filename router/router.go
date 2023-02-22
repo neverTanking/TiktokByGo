@@ -1,11 +1,10 @@
 package router
 
 import (
-	"JWT"
-
-	"github.com/RaymondCode/simple-demo/controller"
 	"github.com/gin-gonic/gin"
+	"github.com/neverTanking/TiktokByGo/controller"
 	"github.com/neverTanking/TiktokByGo/db"
+	"github.com/neverTanking/TiktokByGo/middleware/JWT"
 )
 
 func InitRouter(r *gin.Engine) *gin.Engine {
@@ -16,18 +15,18 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 	apiRouter := r.Group("/douyin")
 
 	// basic apis
-	apiRouter.GET("/feed/", JWT.WTMiddleware(), controller.Feed)
-	apiRouter.GET("/user/", JWT.WTMiddleware(), controller.UserInfo)
+	apiRouter.GET("/feed/", JWT.JWTMiddleware(), controller.Feed)
+	apiRouter.GET("/user/", JWT.JWTMiddleware(), controller.UserInfo)
 	apiRouter.POST("/user/register/", controller.Register) //
 	apiRouter.POST("/user/login/", controller.Login)       //
-	apiRouter.POST("/publish/action/", JWT.WTMiddleware(), controller.Publish)
-	apiRouter.GET("/publish/list/", JWT.WTMiddleware(), controller.PublishList)
+	apiRouter.POST("/publish/action/", JWT.JWTMiddleware(), controller.Publish)
+	apiRouter.GET("/publish/list/", JWT.JWTMiddleware(), controller.PublishList)
 
 	// extra apis - I
-	apiRouter.POST("/favorite/action/", JWT.WTMiddleware(), controller.FavoriteAction)
-	apiRouter.GET("/favorite/list/", JWT.WTMiddleware(), controller.FavoriteList)
-	apiRouter.POST("/comment/action/", JWT.WTMiddleware(), controller.CommentAction)
-	apiRouter.GET("/comment/list/", JWT.WTMiddleware(), controller.CommentList)
+	apiRouter.POST("/favorite/action/", JWT.JWTMiddleware(), controller.FavoriteAction)
+	apiRouter.GET("/favorite/list/", JWT.JWTMiddleware(), controller.FavoriteList)
+	apiRouter.POST("/comment/action/", JWT.JWTMiddleware(), controller.CommentAction)
+	apiRouter.GET("/comment/list/", JWT.JWTMiddleware(), controller.CommentList)
 
 	// extra apis - II
 	// apiRouter.POST("/relation/action/", controller.RelationAction)
