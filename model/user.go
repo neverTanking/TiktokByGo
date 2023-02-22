@@ -6,7 +6,6 @@ import (
 	"github.com/neverTanking/TiktokByGo/db"
 )
 
-var curUser db.User
 var fakeUserId uint = 0
 var fakeUser = User{}
 var errExistedUser = errors.New("user exist")
@@ -17,9 +16,13 @@ var errWrongPassword = errors.New("wrong password")
 
 func CreatUser(username string, password string) (userID uint, err error) {
 	//确保用户名不会重复
-	_, exist := SearchUserByName(username)
-	if exist != false { //已经存在数据
+	var curUser db.User
+	var _, err1 = SearchUserByName(username)
+	if err1 == nil {
 		return fakeUserId, errExistedUser
+	}
+	if !errors.Is(err1, errNotFound) {
+		return fakeUserId, fmt.Errorf("unknown search user err, create stop:%v", err1)
 	}
 	curUser = db.User{
 		Name:     username,
@@ -27,17 +30,19 @@ func CreatUser(username string, password string) (userID uint, err error) {
 	}
 	res := db.DB.Create(&curUser)
 	if res.Error != nil {
-		return fakeUserId, fmt.Errorf("create user %v failed and db error: %v", username, res.Error)
+		return fakeUserId, fmt.Errorf("create user %v failed beacuse database error: %v", username, res.Error)
 	}
 	return curUser.ID, nil
 }
 
-func SearchUserByID(id uint) (user User, ok bool) {
-	res := db.DB.Find(&curUser, id)
+func SearchUserByID(id uint) (user User, err error) {
+	var curUser db.User
+	res := db.DB.First(&curUser, id)
 	if res.Error != nil {
-		if res.RowsAffected == 0 {
-			return fakeUser, false
-		}
+		return fakeUser, fmt.Errorf("database err:%v", res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return fakeUser, errNotFound
 	}
 	return User{
 		ID:              curUser.ID,
@@ -51,15 +56,17 @@ func SearchUserByID(id uint) (user User, ok bool) {
 		TotalFavorited:  "",
 		WorkCount:       0,
 		IsFollow:        false,
-	}, true
+	}, nil
 }
 
-func SearchUserByName(username string) (user User, ok bool) {
+func SearchUserByName(username string) (user User, err error) {
+	var curUser db.User
 	res := db.DB.Where("name = ?", username).Find(&curUser)
 	if res.Error != nil {
-		if res.RowsAffected == 0 {
-			return fakeUser, false
-		}
+		return fakeUser, fmt.Errorf("database err:%v", res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return fakeUser, errNotFound
 	}
 	return User{
 		ID:              curUser.ID,
@@ -73,17 +80,18 @@ func SearchUserByName(username string) (user User, ok bool) {
 		TotalFavorited:  "",
 		WorkCount:       0,
 		IsFollow:        false,
-	}, true
+	}, nil
 }
 
 func SearchUserForVerify(id uint, password string) error {
+	var curUser db.User
 	res := db.DB.Find(&curUser, id)
 	//
 	if res.Error != nil {
-		if res.RowsAffected == 0 {
-			return errNotFound
-		}
 		return fmt.Errorf("database error:%v", res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return errNotFound
 	}
 	if curUser.Password != password {
 		return errWrongPassword
