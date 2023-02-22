@@ -25,3 +25,8 @@ type Video struct {
 	CommentCount  int64 `json:"comment_count"`
 	IsFavorite    bool  `json:"is_favorite"`
 }
+
+type Comment struct {
+	db.Comment
+	User User `json:"user"`
+}
