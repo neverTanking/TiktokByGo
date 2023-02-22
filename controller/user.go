@@ -6,11 +6,6 @@ import (
 	"net/http"
 )
 
-type User struct {
-	model.User
-	IsFollow bool `json:"is_follow"` // true-已关注，false-未关注
-}
-
 // token -> user_id
 var UsersLoginInfo = map[string]int64{
 	"zhanglei---douyin": 1,
