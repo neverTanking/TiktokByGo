@@ -11,6 +11,7 @@ func TestDBInit(t *testing.T) {
 }
 
 func TestUniqueUsername(t *testing.T) {
+	//This test will fail
 	db.Init()
 	user1 := db.User{
 		Model:           gorm.Model{},

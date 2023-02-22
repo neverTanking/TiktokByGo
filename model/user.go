@@ -29,12 +29,18 @@ func SearchUserByID(id uint) (user User, ok bool) {
 		}
 	}
 	return User{
-		User:           curUser,
-		FavoriteCount:  0,
-		FollowCount:    0,
-		FollowerCount:  0,
-		TotalFavorited: "",
-		WorkCount:      0,
+		ID:              curUser.ID,
+		Name:            curUser.Name,
+		Password:        curUser.Password,
+		Avatar:          curUser.Avatar,
+		BackgroundImage: curUser.BackgroundImage,
+		Signature:       curUser.Signature,
+		FavoriteCount:   0,
+		FollowCount:     0,
+		FollowerCount:   0,
+		TotalFavorited:  "",
+		WorkCount:       0,
+		IsFollow:        false,
 	}, true
 
 }
@@ -46,11 +52,17 @@ func SearchUserByName(username string) (user User, ok bool) {
 		}
 	}
 	return User{
-		User:           curUser,
-		FavoriteCount:  0,
-		FollowCount:    0,
-		FollowerCount:  0,
-		TotalFavorited: "",
-		WorkCount:      0,
+		ID:              curUser.ID,
+		Name:            curUser.Name,
+		Password:        curUser.Password,
+		Avatar:          curUser.Avatar,
+		BackgroundImage: curUser.BackgroundImage,
+		Signature:       curUser.Signature,
+		FavoriteCount:   0,
+		FollowCount:     0,
+		FollowerCount:   0,
+		TotalFavorited:  "",
+		WorkCount:       0,
+		IsFollow:        false,
 	}, true
 }

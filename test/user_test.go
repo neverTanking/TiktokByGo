@@ -20,6 +20,7 @@ func TestSearchUserByName(t *testing.T) {
 func TestSearchUserById(t *testing.T) {
 	db.Init()
 	user, _ := model.SearchUserByID(1)
+	fmt.Println(user)
 	b, err := json.Marshal(user)
 	if err != nil {
 		fmt.Println("json err:", err)
