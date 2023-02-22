@@ -58,7 +58,7 @@ func (p *ProxyFavorVideoListController) SendError(msg string) {
 }
 
 func (p *ProxyFavorVideoListController) SendOk(favorList *video.FavorList) {
-	p.JSON(http.StatusOK, FavorVideoListResponse{CommonResponse: db.CommonResponse{StatusCode: 0},
+	p.JSON(http.StatusOK, FavorVideoListResponse{CommonResponse: db.CommonResponse{StatusCode: 0, StatusMsg: "success"},
 		FavorList: favorList,
 	})
 }

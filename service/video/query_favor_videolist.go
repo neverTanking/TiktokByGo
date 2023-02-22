@@ -58,7 +58,10 @@ func (q *QueryFavorVideoListFlow) prepareData() error {
 	//fmt.Println("99999999", q.likes[0].VideoID)
 	//return nil
 	//填充信息(Author和IsFavorite字段，由于是点赞列表，故所有的都是点赞状态
+	fmt.Println(len(q.likes))
 	for i := range q.likes {
+
+		fmt.Println(q.likes[i])
 		//有了videoId,现在要在videos中查这个视频作者是谁
 		var like db.Like
 		//获取单个video
@@ -70,6 +73,7 @@ func (q *QueryFavorVideoListFlow) prepareData() error {
 		//查询的是对的
 		//return nil
 		//作者信息查询
+		var OneVideo model.Video
 		var db_userInfo db.User
 		var model_userInfo model.User
 		model_userInfo.FavoriteCount = 0
@@ -84,15 +88,15 @@ func (q *QueryFavorVideoListFlow) prepareData() error {
 		if err != nil {
 			return err
 		}
-		//if err == nil { //若查询未出错则更新，否则不更新作者信息
-		//fmt.Println(q.videos[i].User)
-		//return nil
-		//q.videos[i].User = model_userInfo
-		//}
-		q.videos[i].FavoriteCount = 0
-		q.videos[i].CommentCount = 0
-		q.videos[i].IsFavorite = true
-		return nil
+		if err == nil { //若查询未出错则更新，否则不更新作者信息
+			OneVideo.User = model_userInfo
+		}
+		OneVideo.FavoriteCount = 0
+		OneVideo.CommentCount = 0
+		OneVideo.IsFavorite = true
+
+		q.videos = append(q.videos, &OneVideo)
+
 	}
 	return nil
 }
