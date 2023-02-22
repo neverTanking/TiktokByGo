@@ -32,7 +32,6 @@ func (p *ProxyFavorVideoListController) Do() {
 		p.SendError(err.Error())
 		return
 	}
-
 	//正式调用
 	favorVideoList, err := video.QueryFavorVideoList(p.userId)
 	if err != nil {
@@ -44,7 +43,7 @@ func (p *ProxyFavorVideoListController) Do() {
 }
 
 func (p *ProxyFavorVideoListController) parseNum() error {
-	rawUserId, _ := p.Get("user_id")
+	rawUserId, _ := p.Get("UserId")
 	userId, ok := rawUserId.(int64)
 	if !ok {
 		return errors.New("userId解析出错")
@@ -59,7 +58,7 @@ func (p *ProxyFavorVideoListController) SendError(msg string) {
 }
 
 func (p *ProxyFavorVideoListController) SendOk(favorList *video.FavorList) {
-	p.JSON(http.StatusOK, FavorVideoListResponse{CommonResponse: db.CommonResponse{StatusCode: 0},
+	p.JSON(http.StatusOK, FavorVideoListResponse{CommonResponse: db.CommonResponse{StatusCode: 0, StatusMsg: "success"},
 		FavorList: favorList,
 	})
 }
