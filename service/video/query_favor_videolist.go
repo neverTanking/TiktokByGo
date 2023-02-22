@@ -76,14 +76,21 @@ func (q *QueryFavorVideoListFlow) prepareData() error {
 		model_userInfo.FollowCount = 0
 		model_userInfo.FollowerCount = 0
 		model_userInfo.WorkCount = 0
-		model_userInfo.TotalFavorited = 0
-		err := dao.NewUserInfoDAO().QueryUserInfoById(int64(like.UserID), &userInfo)
-		fmt.Println(userInfo)
+		model_userInfo.TotalFavorited = "0"
+		err := dao.NewUserInfoDAO().QueryUserInfoById(int64(like.UserID), &db_userInfo)
+		fmt.Println(db_userInfo)
 		//return nil
 		//更新videos里
-		if err == nil { //若查询未出错则更新，否则不更新作者信息
-			q.videos[i].User = userInfo
+		if err != nil {
+			return err
 		}
+		//if err == nil { //若查询未出错则更新，否则不更新作者信息
+		//fmt.Println(q.videos[i].User)
+		//return nil
+		//q.videos[i].User = model_userInfo
+		//}
+		q.videos[i].FavoriteCount = 0
+		q.videos[i].CommentCount = 0
 		q.videos[i].IsFavorite = true
 		return nil
 	}
