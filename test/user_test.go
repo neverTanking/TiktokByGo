@@ -1,6 +1,7 @@
 package test
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/neverTanking/TiktokByGo/db"
 	"github.com/neverTanking/TiktokByGo/model"
@@ -18,5 +19,10 @@ func TestSearchUserByName(t *testing.T) {
 }
 func TestSearchUserById(t *testing.T) {
 	db.Init()
-	fmt.Println(model.SearchUserByID(1))
+	user, _ := model.SearchUserByID(1)
+	b, err := json.Marshal(user)
+	if err != nil {
+		fmt.Println("json err:", err)
+	}
+	fmt.Println(string(b))
 }
