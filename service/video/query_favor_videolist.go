@@ -2,7 +2,7 @@ package video
 
 import (
 	"errors"
-	"fmt"
+	"github.com/neverTanking/TiktokByGo/cache/Redis"
 	"github.com/neverTanking/TiktokByGo/db"
 	"github.com/neverTanking/TiktokByGo/model"
 	"github.com/neverTanking/TiktokByGo/model/dao"
@@ -55,12 +55,9 @@ func (q *QueryFavorVideoListFlow) prepareData() error {
 	if err := dao.NewVideoDAO().QueryFavorVideoListByUserId(q.userId, &q.likes); err != nil {
 		return err
 	}
-	//fmt.Println("99999999", q.likes[0].VideoID)
-	//return nil
-	//填充信息(Author和IsFavorite字段，由于是点赞列表，故所有的都是点赞状态
-	fmt.Println(len(q.likes))
-	for i := range q.likes {
 
+	//填充信息(Author和IsFavorite字段，由于是点赞列表，故所有的都是点赞状态
+	for i := range q.likes {
 		//有了videoId,现在要在videos中查这个视频作者是谁
 		var like db.Like
 		//获取单个videoId
@@ -93,7 +90,10 @@ func (q *QueryFavorVideoListFlow) prepareData() error {
 		}
 		model_userInfo.User = db_userInfo
 		OneVideo.Author = model_userInfo
-		OneVideo.FavoriteCount = 0
+		OneVideo.FavoriteCount, err = Redis.NewRedisDao().GetLikeNumByVideoId(OneVideo.Video.ID)
+		if err != nil { //如果找不到就是0
+			OneVideo.FavoriteCount = 0
+		}
 		OneVideo.CommentCount = 0
 		OneVideo.IsFavorite = true
 

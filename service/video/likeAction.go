@@ -84,8 +84,11 @@ func (u *LikeState) LikeVideo() error {
 	if err := dao.NewVideoDAO().AddOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
 		return err
 	}
-
 	if err := Redis.NewRedisDao().UpdatePostLike(u.UserId, u.VideoId, true); err != nil {
+		return err
+	}
+	//给视频的喜欢总数加1
+	if err := Redis.NewRedisDao().AddOneLikeNumByVideoId(u.VideoId); err != nil {
 		return err
 	}
 	return nil
@@ -105,6 +108,9 @@ func (u *LikeState) UnLikeVideo() error {
 		return err
 	}
 	if err := Redis.NewRedisDao().UpdatePostLike(u.UserId, u.VideoId, false); err != nil {
+		return err
+	}
+	if err := Redis.NewRedisDao().SubOneLikeNumByVideoId(u.VideoId); err != nil {
 		return err
 	}
 	return err
