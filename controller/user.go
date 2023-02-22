@@ -83,16 +83,22 @@ func Login(c *gin.Context) {
 	}
 
 	// 2. 查询用户是否存在，并返回用户信息
-	user, exist := model.SearchUserByName(username)
-	if !exist {
+	user, err := model.SearchUserByName(username)
+	if err != nil {
+		if errors.Is(err, errNotFound) {
+			c.JSON(http.StatusOK, UserLoginResponse{
+				Response: Response{StatusCode: Fail, StatusMsg: NotExisted},
+			})
+			return
+		}
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: Fail, StatusMsg: NotExisted},
+			Response: Response{StatusCode: Fail, StatusMsg: UnknownReason},
 		})
 		return
 	}
 	//3. 验证密码
-	err := model.SearchUserForVerify(user.ID, password)
-	if err != nil {
+	err1 := model.SearchUserForVerify(user.ID, password)
+	if err1 != nil {
 		if errors.Is(err, errNotFound) {
 			c.JSON(http.StatusOK, UserLoginResponse{
 				Response: Response{StatusCode: Fail, StatusMsg: NotExisted},
@@ -135,10 +141,15 @@ func UserInfo(c *gin.Context) {
 
 	var userId, _ = strconv.ParseUint(c.Query("user_id"), 10, 64)
 
-	user, ok := model.SearchUserByID(uint(userId))
-	if ok != true {
+	user, err := model.SearchUserByID(uint(userId))
+	if err != nil {
+		if errors.Is(err, errNotFound) {
+			c.JSON(http.StatusOK, UserResponse{
+				Response: Response{StatusCode: Fail, StatusMsg: NotExisted},
+			})
+		}
 		c.JSON(http.StatusOK, UserResponse{
-			Response: Response{StatusCode: Fail, StatusMsg: NotExisted},
+			Response: Response{StatusCode: Fail, StatusMsg: UnknownReason},
 		})
 	}
 	c.JSON(http.StatusOK, UserResponse{
