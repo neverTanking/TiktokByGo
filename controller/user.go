@@ -10,11 +10,6 @@ import (
 	"strconv"
 )
 
-type User struct {
-	model.User
-	IsFollow bool `json:"is_follow"` // true-已关注,false-未关注
-
-
 type UserLoginResponse struct {
 	Response
 	UserId uint   `json:"user_id,omitempty"`
