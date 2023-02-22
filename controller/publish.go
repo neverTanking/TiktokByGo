@@ -1,9 +1,13 @@
 package controller
 
 import (
-	"fmt"
+	"log"
 	"net/http"
-	"path/filepath"
+	"path"
+	"strconv"
+
+	"github.com/neverTanking/TiktokByGo/service"
+	uuid "github.com/satori/go.uuid"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,47 +18,52 @@ type VideoListResponse struct {
 }
 
 // Publish check token then save upload file to public directory
-func Publish(c *gin.Context) {
-	token := c.PostForm("token")
-
-	if _, exist := usersLoginInfo[token]; !exist {
-		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
-		return
-	}
-
+func Publish1(c *gin.Context) {
 	data, err := c.FormFile("data")
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
 
-	filename := filepath.Base(data.Filename)
-	user := usersLoginInfo[token]
-	finalName := fmt.Sprintf("%d_%s", user.Id, filename)
-	saveFile := filepath.Join("./public/", finalName)
-	if err := c.SaveUploadedFile(data, saveFile); err != nil {
+	userId, _ := strconv.ParseInt(c.GetString("userId"), 10, 64)
+	log.Printf("获取到用户id:%v\n", userId)
+	title := c.PostForm("title")
+	log.Printf("获取到视频title:%v\n", title)
+	if err != nil {
+		log.Printf("获取视频流失败:%v", err)
 		c.JSON(http.StatusOK, Response{
 			StatusCode: 1,
 			StatusMsg:  err.Error(),
 		})
 		return
 	}
+	//
+	//生成一个uuid作为视频的名字
+	videoName := uuid.NewV4().String()
+	//生成一个uuid作为图片的名字
+	imageName := uuid.NewV4().String()
+	ffmpegdst := path.Join("~/videorepo", videoName+".mp4")
+	c.SaveUploadedFile(data, ffmpegdst)
+	err = service.Publish_up(data, userId, title, videoName, imageName)
+
+	if err != nil {
+		log.Printf("方法videoService.Publish(data, userId) 失败：%v", err)
+		c.JSON(http.StatusOK, Response{
+			StatusCode: 1,
+			StatusMsg:  err.Error(),
+		})
+		return
+	}
+	log.Printf("方法videoService.Publish(data, userId) 成功")
 
 	c.JSON(http.StatusOK, Response{
 		StatusCode: 0,
-		StatusMsg:  finalName + " uploaded successfully",
+		StatusMsg:  "uploaded successfully",
 	})
 }
 
-// PublishList all users have same publish video list
-func PublishList(c *gin.Context) {
-	c.JSON(http.StatusOK, VideoListResponse{
-		Response: Response{
-			StatusCode: 0,
-		},
-		VideoList: DemoVideos,
-	})
-}
+// // PublishList all users have same publish video list
+// func PublishList1(c *gin.Context) {
+// 	c.JSON(http.StatusOK, VideoListResponse{
+// 		Response: Response{
+// 			StatusCode: 0,
+// 		},
+// 		VideoList: DemoVideos,
+// 	})
+// }
