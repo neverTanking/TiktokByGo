@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/neverTanking/TiktokByGo/middleware/JWT"
@@ -12,7 +13,7 @@ import (
 type User struct {
 	model.User
 	IsFollow bool `json:"is_follow"` // true-已关注,false-未关注
-}
+
 
 type UserLoginResponse struct {
 	Response
@@ -49,17 +50,15 @@ func Register(c *gin.Context) {
 		})
 	}
 
-	// 2. 查询用户是否存在，并返回用户信息
-	_, exist := model.SearchUserByName(username)
 	// 3.1 存在则报错
-	if exist {
-		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: Fail, StatusMsg: Existed},
-		})
-	}
+
 	// 3.2 不存在则创建用户，并返回用户信息
 	userId, err := model.CreatUser(username, password)
 	if err != nil {
+		errors.Unwrap(err)
+		c.JSON(http.StatusOK, UserLoginResponse{
+			Response: Response{StatusCode: Fail, StatusMsg: Existed},
+		})
 		fmt.Println(fmt.Errorf("%v", err))
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: Fail, StatusMsg: UnknownReason},

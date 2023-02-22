@@ -16,7 +16,7 @@ type Like struct {
 }
 type User struct {
 	gorm.Model
-	Name            string `json:"name"`
+	Name            string `json:"name,"`
 	Password        string `json:"password,omitempty"`
 	Avatar          string `json:"avatar"`           // 用户头像
 	BackgroundImage string `json:"background_image"` // 用户个人页顶部大图

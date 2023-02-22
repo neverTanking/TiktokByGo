@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"github.com/neverTanking/TiktokByGo/db"
 )
@@ -8,8 +9,20 @@ import (
 var curUser db.User
 var fakeUserId uint = 0
 var fakeUser = User{}
+var errExistedUser = errors.New("user exist")
+
+//TODO: 需要一个检查数据库中是否有重复数据的维护函数
+
+func FixUserDB() error {
+
+}
 
 func CreatUser(username string, password string) (userID uint, err error) {
+	//确保用户名不会重复
+	_, exist := SearchUserByName(username)
+	if exist != false { //已经存在数据
+		return fakeUserId, errExistedUser
+	}
 	curUser = db.User{
 		Name:     username,
 		Password: password,
