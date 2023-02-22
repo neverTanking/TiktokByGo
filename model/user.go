@@ -10,6 +10,8 @@ var curUser db.User
 var fakeUserId uint = 0
 var fakeUser = User{}
 var errExistedUser = errors.New("user exist")
+var errNotFound = errors.New("user not found")
+var errWrongPassword = errors.New("wrong password")
 
 //TODO: 需要一个检查数据库中是否有重复数据的维护函数
 
@@ -40,7 +42,6 @@ func SearchUserByID(id uint) (user User, ok bool) {
 	return User{
 		ID:              curUser.ID,
 		Name:            curUser.Name,
-		Password:        curUser.Password,
 		Avatar:          curUser.Avatar,
 		BackgroundImage: curUser.BackgroundImage,
 		Signature:       curUser.Signature,
@@ -51,8 +52,8 @@ func SearchUserByID(id uint) (user User, ok bool) {
 		WorkCount:       0,
 		IsFollow:        false,
 	}, true
-
 }
+
 func SearchUserByName(username string) (user User, ok bool) {
 	res := db.DB.Where("name = ?", username).Find(&curUser)
 	if res.Error != nil {
@@ -63,7 +64,6 @@ func SearchUserByName(username string) (user User, ok bool) {
 	return User{
 		ID:              curUser.ID,
 		Name:            curUser.Name,
-		Password:        curUser.Password,
 		Avatar:          curUser.Avatar,
 		BackgroundImage: curUser.BackgroundImage,
 		Signature:       curUser.Signature,
@@ -74,4 +74,21 @@ func SearchUserByName(username string) (user User, ok bool) {
 		WorkCount:       0,
 		IsFollow:        false,
 	}, true
+}
+
+func SearchUserForVerify(id uint, password string) error {
+	res := db.DB.Find(&curUser, id)
+	//
+	if res.Error != nil {
+		if res.RowsAffected == 0 {
+			return errNotFound
+		}
+		return fmt.Errorf("database error:%v", res.Error)
+	}
+	if curUser.Password != password {
+		return errWrongPassword
+	}
+
+	return nil
+
 }

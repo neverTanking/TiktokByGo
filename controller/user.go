@@ -10,6 +10,9 @@ import (
 	"strconv"
 )
 
+var errNotFound = errors.New("user not found")
+var errWrongPassword = errors.New("wrong password")
+
 type UserLoginResponse struct {
 	Response
 	UserId uint   `json:"user_id,omitempty"`
@@ -19,12 +22,6 @@ type UserLoginResponse struct {
 type UserResponse struct {
 	Response
 	User model.User `json:"user"`
-}
-
-// 验证密码
-func verifyPassword(input string, password string) bool {
-
-	return input == password
 }
 
 func isUsernameValid(username string) bool {
@@ -94,9 +91,24 @@ func Login(c *gin.Context) {
 		return
 	}
 	//3. 验证密码
-	if !verifyPassword(password, user.Password) {
+	err := model.SearchUserForVerify(user.ID, password)
+	if err != nil {
+		if errors.Is(err, errNotFound) {
+			c.JSON(http.StatusOK, UserLoginResponse{
+				Response: Response{StatusCode: Fail, StatusMsg: NotExisted},
+			})
+			return
+		}
+		if errors.Is(err, errWrongPassword) {
+			c.JSON(http.StatusOK, UserLoginResponse{
+				Response: Response{StatusCode: Fail, StatusMsg: WrongPassword},
+			})
+			return
+		}
+		//Unknown reason
+
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: Fail, StatusMsg: WrongPassword},
+			Response: Response{StatusCode: Fail, StatusMsg: UnknownReason},
 		})
 		return
 	}
