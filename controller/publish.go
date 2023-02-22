@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"path"
 	"strconv"
-	uuid "github.com/satori/go.uuid"
+
 	"github.com/neverTanking/TiktokByGo/service"
+	uuid "github.com/satori/go.uuid"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,7 +40,7 @@ func Publish1(c *gin.Context) {
 	imageName := uuid.NewV4().String()
 	ffmpegdst := path.Join("~/videorepo", videoName+".mp4")
 	c.SaveUploadedFile(data, ffmpegdst)
-	err = service.Publish_up(data, userId, title,videoName,imageName)
+	err = service.Publish_up(data, userId, title, videoName, imageName)
 
 	if err != nil {
 		log.Printf("方法videoService.Publish(data, userId) 失败：%v", err)

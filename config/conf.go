@@ -28,6 +28,10 @@ var (
 	HeartbeatTime  = 2 * 60
 
 	BucketName   = "short_videos"
-	BucketFfmpeg = "Ffmpeg"
+	BucketFfmpeg = "cover"
 	Location     = "cn-north-1"
 )
+
+// PlayUrlPrefix 存储的图片和视频的链接
+const PlayUrlPrefix = "http://192.168.199.129/short_video"
+const CoverUrlPrefix = "http://192.168.199.129/cover"

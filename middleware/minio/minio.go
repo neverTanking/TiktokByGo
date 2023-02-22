@@ -69,8 +69,3 @@ func VideoToMinio(file *multipart.FileHeader, videoname string, imageName string
 	return nil
 
 }
-
-func Save(videoName string, imageName string, userId int64, title string) error {
-
-	return nil
-}
