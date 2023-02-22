@@ -69,3 +69,13 @@ func (u *VideoDAO) SubOneLikeByUserIdAndVideoId(UserId uint, VideoId uint) error
 		return nil
 	})
 }
+
+// 根据videoId查video表所有信息
+func (u *VideoDAO) QueryVideoInformationByVideoId(videoId uint, video *db.Video) error {
+	return db.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("id = ?", videoId).First(&video).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}

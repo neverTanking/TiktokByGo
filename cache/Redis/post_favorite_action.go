@@ -29,3 +29,5 @@ func (u *RedisDao) GetLikeState(userId uint, vedioId uint) (bool, error) {
 	}
 	return ok, nil
 }
+
+//根据UserId

@@ -61,19 +61,23 @@ func (q *QueryFavorVideoListFlow) prepareData() error {
 	fmt.Println(len(q.likes))
 	for i := range q.likes {
 
-		fmt.Println(q.likes[i])
 		//有了videoId,现在要在videos中查这个视频作者是谁
 		var like db.Like
-		//获取单个video
+		//获取单个videoId
 		if err := dao.NewUserInfoDAO().QueryUserIdByVideoIdInVideos(int64(q.likes[i].VideoID), &like); err != nil {
 			return err
 		}
 
+		var db_video db.Video
+		if err := dao.NewVideoDAO().QueryVideoInformationByVideoId(like.VideoID, &db_video); err != nil {
+			return err
+		}
 		//fmt.Println("888888", like.UserID)
 		//查询的是对的
 		//return nil
 		//作者信息查询
 		var OneVideo model.Video
+		OneVideo.Video = db_video
 		var db_userInfo db.User
 		var model_userInfo model.User
 		model_userInfo.FavoriteCount = 0
@@ -82,15 +86,13 @@ func (q *QueryFavorVideoListFlow) prepareData() error {
 		model_userInfo.WorkCount = 0
 		model_userInfo.TotalFavorited = "0"
 		err := dao.NewUserInfoDAO().QueryUserInfoById(int64(like.UserID), &db_userInfo)
-		fmt.Println(db_userInfo)
 		//return nil
 		//更新videos里
 		if err != nil {
 			return err
 		}
-		if err == nil { //若查询未出错则更新，否则不更新作者信息
-			OneVideo.User = model_userInfo
-		}
+		model_userInfo.User = db_userInfo
+		OneVideo.Author = model_userInfo
 		OneVideo.FavoriteCount = 0
 		OneVideo.CommentCount = 0
 		OneVideo.IsFavorite = true
