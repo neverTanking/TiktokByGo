@@ -31,7 +31,6 @@ func SearchUserByID(id uint) (user User, ok bool) {
 	return User{
 		ID:              curUser.ID,
 		Name:            curUser.Name,
-		Password:        curUser.Password,
 		Avatar:          curUser.Avatar,
 		BackgroundImage: curUser.BackgroundImage,
 		Signature:       curUser.Signature,
@@ -54,7 +53,6 @@ func SearchUserByName(username string) (user User, ok bool) {
 	return User{
 		ID:              curUser.ID,
 		Name:            curUser.Name,
-		Password:        curUser.Password,
 		Avatar:          curUser.Avatar,
 		BackgroundImage: curUser.BackgroundImage,
 		Signature:       curUser.Signature,

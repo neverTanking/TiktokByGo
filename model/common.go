@@ -8,7 +8,6 @@ type Response struct {
 type User struct {
 	ID              uint   `json:"id"`
 	Name            string `json:"name"`
-	Password        string `json:"password,omitempty"`
 	Avatar          string `json:"avatar"`           // 用户头像
 	BackgroundImage string `json:"background_image"` // 用户个人页顶部大图
 	Signature       string `json:"signature"`        // 个人简介
