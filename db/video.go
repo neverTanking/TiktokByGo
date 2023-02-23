@@ -37,5 +37,17 @@ func SaveDao(videoName string, imageName string, authorId int64, title string) e
 	}
 	return nil
 }
+func GetVideosByAuthorId(authorId int64) ([]TableVideo, error) {
+	//建立结果集接收
+	var data []TableVideo
+	//初始化db
+	//Init()
+	result := DB.Where(&TableVideo{AuthorId: authorId}).Find(&data)
+	//如果出现问题，返回对应到空，并且返回error
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return data, nil
+}
 
 // Save update value in database, if the value doesn't have primary key, will insert it

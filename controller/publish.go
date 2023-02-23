@@ -58,12 +58,24 @@ func Publish1(c *gin.Context) {
 	})
 }
 
-// // PublishList all users have same publish video list
-// func PublishList1(c *gin.Context) {
-// 	c.JSON(http.StatusOK, VideoListResponse{
-// 		Response: Response{
-// 			StatusCode: 0,
-// 		},
-// 		VideoList: DemoVideos,
-// 	})
-// }
+func PublishList(c *gin.Context) {
+	user_Id, _ := c.GetQuery("user_id")
+	userId, _ := strconv.ParseInt(user_Id, 10, 64)
+	log.Printf("获取到用户id:%v\n", userId)
+	curId, _ := strconv.ParseInt(c.GetString("userId"), 10, 64)
+	log.Printf("获取到当前用户id:%v\n", curId)
+	videoService := GetVideo()
+	list, err := videoService.List(userId, curId)
+	if err != nil {
+		log.Printf("调用videoService.List(%v)出现错误：%v\n", userId, err)
+		c.JSON(http.StatusOK, VideoListResponse{
+			Response: Response{StatusCode: 1, StatusMsg: "获取视频列表失败"},
+		})
+		return
+	}
+	log.Printf("调用videoService.List(%v)成功", userId)
+	c.JSON(http.StatusOK, VideoListResponse{
+		Response:  Response{StatusCode: 0},
+		VideoList: list,
+	})
+}
