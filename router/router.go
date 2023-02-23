@@ -15,9 +15,9 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 
 	// basic apis
 	apiRouter.GET("/feed/", controller.Feed)
-	//apiRouter.GET("/user/", controller.UserInfo)
-	//apiRouter.POST("/user/register/", controller.Register)
-	//apiRouter.POST("/user/login/", controller.Login)
+	apiRouter.GET("/user/", controller.UserInfo)
+	apiRouter.POST("/user/register/", controller.Register)
+	apiRouter.POST("/user/login/", controller.Login)
 	//apiRouter.POST("/publish/action/", controller.Publish)
 	//apiRouter.GET("/publish/list/", controller.PublishList)
 	//
@@ -26,5 +26,6 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 	//apiRouter.GET("/favorite/list/", video.FavoriteList)
 	//apiRouter.POST("/comment/action/", controller.CommentAction)
 	//apiRouter.GET("/comment/list/", controller.CommentList)
+
 	return r
 }
