@@ -28,5 +28,5 @@ type Video struct {
 
 type Comment struct {
 	db.Comment
-	User User `json:"user"`
+	User_ User `json:"user"`
 }

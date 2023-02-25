@@ -2,6 +2,7 @@ package video
 
 import (
 	"errors"
+	"fmt"
 	"github.com/neverTanking/TiktokByGo/cache/Redis"
 	"github.com/neverTanking/TiktokByGo/db"
 	"github.com/neverTanking/TiktokByGo/model"
@@ -39,6 +40,7 @@ func (q *QueryFavorVideoListFlow) Do() (*FavorList, error) {
 	if err := q.packData(); err != nil {
 		return nil, err
 	}
+	//fmt.Println(q.videos)
 	return q.videoList, nil
 }
 
@@ -77,12 +79,20 @@ func (q *QueryFavorVideoListFlow) prepareData() error {
 		OneVideo.Video = db_video
 		var db_userInfo db.User
 		var model_userInfo model.User
-		model_userInfo.FavoriteCount = 0
+		var err error
+		model_userInfo.FavoriteCount, err = Redis.NewRedisDao().GetUserFavoriteCount(uint(q.userId))
+		if err != nil {
+			return err
+		}
 		model_userInfo.FollowCount = 0
 		model_userInfo.FollowerCount = 0
-		model_userInfo.WorkCount = 0
+		model_userInfo.WorkCount, err = Redis.NewRedisDao().GetUserWorkCount(uint(q.userId))
+		if err != nil {
+			return err
+		}
+
 		model_userInfo.TotalFavorited = "0"
-		err := dao.NewUserInfoDAO().QueryUserInfoById(int64(like.UserID), &db_userInfo)
+		err = dao.NewUserInfoDAO().QueryUserInfoById(int64(like.UserID), &db_userInfo)
 		//return nil
 		//更新videos里
 		if err != nil {
@@ -99,10 +109,14 @@ func (q *QueryFavorVideoListFlow) prepareData() error {
 
 		q.videos = append(q.videos, &OneVideo)
 
+		fmt.Println(q.videos[0])
 	}
+	//fmt.Println(q.videos)
 	return nil
 }
 func (q *QueryFavorVideoListFlow) packData() error {
 	q.videoList = &FavorList{Videos: q.videos}
+
+	//fmt.Println(q.videoList)
 	return nil
 }

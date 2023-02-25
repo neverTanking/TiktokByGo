@@ -11,7 +11,7 @@ import (
 
 type commentResponse struct {
 	db.CommonResponse
-	*comment.Comment
+	*comment.Response
 }
 type commentController struct {
 	*gin.Context
@@ -19,10 +19,10 @@ type commentController struct {
 	videoId     uint
 	actionType  int
 	commentText string
-	commentId   int
+	commentId   uint
 }
 
-func commentActionController(c *gin.Context) {
+func CommentActionController(c *gin.Context) {
 	NewCommentController(c).Finish()
 }
 
@@ -33,8 +33,16 @@ func NewCommentController(c *gin.Context) *commentController {
 func (u *commentController) Finish() {
 	//Get parameter
 	if err := u.ParseParameter(); err != nil {
+		u.ReturnError(err.Error())
 		return
 	}
+	commentRes, err := comment.QueryCommentAction(u.userId, u.videoId, u.actionType, u.commentText, u.commentId)
+	//fmt.Println(commentAction)
+	if err != nil {
+		u.ReturnError(err.Error())
+		return
+	}
+	u.ReturnSuccess(commentRes)
 }
 
 func (u *commentController) ParseParameter() error {
@@ -58,14 +66,22 @@ func (u *commentController) ParseParameter() error {
 	}
 	u.actionType = int(ActionType)
 	u.videoId = uint(VideoId)
-	strCommentText := u.Query("comment_text")
-	strCommentId := u.Query("comment_id")
-	commentId, err := strconv.ParseInt(strCommentId, 10, 64)
-	if err != nil {
-		return errors.New("ParseCommentId Failed")
+	if u.actionType == 1 {
+		strCommentText := u.Query("comment_text")
+		u.commentText = strCommentText
+		u.commentId = 0 //默认不存在
+	} else if u.actionType == 2 {
+		strCommentId := u.Query("comment_id")
+		commentId, err := strconv.ParseInt(strCommentId, 10, 64)
+		if err != nil {
+			return errors.New("ParseCommentId Failed")
+		}
+		u.commentId = uint(commentId)
+		u.commentText = "" //默认不存在
+	} else {
+		return errors.New("action_type invalid")
 	}
-	u.commentText = strCommentText
-	u.commentId = int(commentId)
+
 	return nil
 }
 
@@ -74,8 +90,9 @@ func (u *commentController) ReturnError(msg string) {
 		CommonResponse: db.CommonResponse{StatusCode: 1, StatusMsg: msg}})
 }
 
-func (u *commentController) ReturnSuccess() {
+func (u *commentController) ReturnSuccess(comment *comment.Response) {
 	u.JSON(http.StatusOK, commentResponse{
 		CommonResponse: db.CommonResponse{StatusCode: 0, StatusMsg: "success"},
+		Response:       comment,
 	})
 }

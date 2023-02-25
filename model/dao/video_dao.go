@@ -16,17 +16,6 @@ var (
 	videoOnce sync.Once
 )
 
-func (u *UserInfoDAO) IsUserExistById(id int64) bool {
-	var userinfo db.User
-	if err := db.DB.Where("id=?", id).Select("id").First(&userinfo).Error; err != nil {
-		log.Println(err)
-	}
-	if userinfo.ID == 0 {
-		return false
-	}
-	return true
-}
-
 func NewVideoDAO() *VideoDAO {
 	videoOnce.Do(func() {
 		videoDAO = new(VideoDAO)
@@ -78,4 +67,16 @@ func (u *VideoDAO) QueryVideoInformationByVideoId(videoId uint, video *db.Video)
 		}
 		return nil
 	})
+}
+
+// 根据VideoId查询视频是否存在
+func (u *VideoDAO) IsVideoExistById(id int64) bool {
+	var videoInfo db.Video
+	if err := db.DB.Where("id=?", id).First(&videoInfo).Error; err != nil {
+		log.Println(err)
+	}
+	if videoInfo.ID == 0 {
+		return false
+	}
+	return true
 }

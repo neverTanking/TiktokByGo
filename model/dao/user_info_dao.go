@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/neverTanking/TiktokByGo/db"
 	"gorm.io/gorm"
+	"log"
 	"sync"
 )
 
@@ -25,6 +26,16 @@ func NewUserInfoDAO() *UserInfoDAO {
 		userInfoDAO = new(UserInfoDAO)
 	})
 	return userInfoDAO
+}
+func (u *UserInfoDAO) IsUserExistById(id int64) bool {
+	var userinfo db.User
+	if err := db.DB.Where("id=?", id).Select("id").First(&userinfo).Error; err != nil {
+		log.Println(err)
+	}
+	if userinfo.ID == 0 {
+		return false
+	}
+	return true
 }
 
 func (u *UserInfoDAO) QueryUserIdByVideoIdInVideos(videoId int64, like *db.Like) error {

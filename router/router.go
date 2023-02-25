@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/neverTanking/TiktokByGo/controller"
+	"github.com/neverTanking/TiktokByGo/controller/comment"
 	"github.com/neverTanking/TiktokByGo/controller/video"
 	"github.com/neverTanking/TiktokByGo/db"
 	"github.com/neverTanking/TiktokByGo/middleware/JWT"
@@ -27,8 +28,8 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 	// extra apis - I
 	apiRouter.POST("/favorite/action/", JWT.JWTMiddleware(), video.LikeActionController)
 	apiRouter.GET("/favorite/list/", NoAuth.NoAuthMiddleWare(), video.FavoriteListController)
-	apiRouter.POST("/comment/action/", JWT.JWTMiddleware())
-	//apiRouter.GET("/comment/list/", controller.CommentList)
+	apiRouter.POST("/comment/action/", JWT.JWTMiddleware(), comment.CommentActionController)
+	apiRouter.GET("/comment/list/", JWT.JWTMiddleware(), comment.QueryCommentListController)
 	//
 	//// extra apis - II
 	//apiRouter.POST("/relation/action/", controller.RelationAction)

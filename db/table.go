@@ -4,10 +4,10 @@ import "gorm.io/gorm"
 
 type Comment struct {
 	gorm.Model
-	UserID      uint
-	User        User
+	UserID uint
+	//User        User
 	VideoID     uint
-	CommentText string
+	CommentText string `json:"content"`
 }
 type Like struct {
 	gorm.Model
@@ -22,8 +22,8 @@ type User struct {
 	BackgroundImage string `json:"background_image"` // 用户个人页顶部大图
 	Signature       string `json:"signature"`        // 个人简介
 
-	Videos []Video
-	Likes  []Like
+	Videos []Video `json:"-"`
+	Likes  []Like  `json:"-"`
 }
 
 type Video struct {
@@ -33,6 +33,6 @@ type Video struct {
 	CoverUrl string `json:"cover_url"`
 	Title    string `json:"title"`
 
-	Likes    []Like    `json:"likes,omitempty"`
-	Comments []Comment `json:"comments,omitempty"`
+	Likes    []Like    `json:"-"`
+	Comments []Comment `json:"-"`
 }
