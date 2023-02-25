@@ -18,9 +18,9 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 
 	// basic apis
 	apiRouter.GET("/feed/", controller.Feed)
-	//apiRouter.GET("/user/", controller.UserInfo)
-	//apiRouter.POST("/user/register/", controller.Register)
-	//apiRouter.POST("/user/login/", controller.Login)
+	apiRouter.GET("/user/", controller.UserInfo)
+	apiRouter.POST("/user/register/", controller.Register)
+	apiRouter.POST("/user/login/", controller.Login)
 	//apiRouter.POST("/publish/action/", controller.Publish)
 	//apiRouter.GET("/publish/list/", controller.PublishList)
 
@@ -29,6 +29,7 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 	apiRouter.GET("/favorite/list/", NoAuth.NoAuthMiddleWare(), video.FavoriteListController)
 	//apiRouter.POST("/comment/action/", controller.CommentAction)
 	//apiRouter.GET("/comment/list/", controller.CommentList)
+<<<<<<< HEAD
 	//
 	//// extra apis - II
 	//apiRouter.POST("/relation/action/", controller.RelationAction)
@@ -37,5 +38,8 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 	//apiRouter.GET("/relation/friend/list/", controller.FriendList)
 	//apiRouter.GET("/message/chat/", controller.MessageChat)
 	//apiRouter.POST("/message/action/", controller.MessageAction)
+=======
+
+>>>>>>> 1baa5a68629ffb1b0baaa1cd363ace0518dc8406
 	return r
 }

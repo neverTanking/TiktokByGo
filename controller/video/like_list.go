@@ -9,7 +9,7 @@ import (
 )
 
 type FavorVideoListResponse struct {
-	db.CommonResponse
+	db.Response
 	*video.FavorList
 }
 
@@ -54,11 +54,11 @@ func (p *ProxyFavorVideoListController) parseNum() error {
 
 func (p *ProxyFavorVideoListController) SendError(msg string) {
 	p.JSON(http.StatusOK, FavorVideoListResponse{
-		CommonResponse: db.CommonResponse{StatusCode: 1, StatusMsg: msg}})
+		Response: db.Response{StatusCode: 1, StatusMsg: msg}})
 }
 
 func (p *ProxyFavorVideoListController) SendOk(favorList *video.FavorList) {
-	p.JSON(http.StatusOK, FavorVideoListResponse{CommonResponse: db.CommonResponse{StatusCode: 0, StatusMsg: "success"},
+	p.JSON(http.StatusOK, FavorVideoListResponse{Response: db.Response{StatusCode: 0},
 		FavorList: favorList,
 	})
 }
