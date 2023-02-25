@@ -2,9 +2,7 @@ package comment
 
 import (
 	"errors"
-	"fmt"
 	"github.com/neverTanking/TiktokByGo/cache/Redis"
-	"github.com/neverTanking/TiktokByGo/db"
 	"github.com/neverTanking/TiktokByGo/model"
 	"github.com/neverTanking/TiktokByGo/model/dao"
 )
@@ -58,60 +56,41 @@ func (u *commentAction) checkNum() error {
 // 操作数据库
 func (u *commentAction) prepareData() error {
 	var OneCommentAction model.Comment
-	var db_userInfo db.User
 	var model_userInfo model.User
 	var err error
+	model_userInfo, err = model.SearchUserByID(u.userId)
+	if err != nil {
+		return err
+	}
 	model_userInfo.FavoriteCount, err = Redis.NewRedisDao().GetUserFavoriteCount(u.userId)
-	if err != nil {
-		return err
-	}
-	model_userInfo.FollowCount = 0
-	model_userInfo.FollowerCount = 0
 	model_userInfo.WorkCount, err = Redis.NewRedisDao().GetUserWorkCount(u.userId)
-	if err != nil {
-		return err
-	}
 	model_userInfo.TotalFavorited = "0"
-	err = dao.NewUserInfoDAO().QueryUserInfoById(int64(u.userId), &db_userInfo)
-	if err != nil {
-		return err
-	}
-	model_userInfo.User = db_userInfo
-
-	//fmt.Println(model_userInfo)
-
-	//u.comment.User = model_userInfo
-	OneCommentAction.User_ = model_userInfo
-
-	//fmt.Println(OneCommentAction)
-	if u.actionType == 1 { //用户填写评论内容
+	if u.actionType == 1 { //用户插入评论内容
 		if err := dao.NewCommentDAO().InsertCommentByUserIdAndVideoIdAndCommentText(u.userId, u.videoId, u.commentText); err != nil {
 			return err
 		}
-		var comment db.Comment
-		if err := dao.NewCommentDAO().QueryCommentId(&comment); err != nil {
+		OneCommentAction, err = model.SearchCommentByID(u.commentId, model_userInfo, u.actionType)
+		if err != nil {
 			return err
 		}
-		OneCommentAction.Comment.ID = comment.ID
-
 	} else { //用户删除评论内容
 		//先判断这个CommentId在不在
 		if ok := dao.NewCommentDAO().IsExistsCommentId(u.commentId); !ok {
 			return errors.New("CommentId 不存在")
 		}
+		OneCommentAction, err = model.SearchCommentByID(u.commentId, model_userInfo, u.actionType)
+		if err != nil {
+			return err
+		}
 		if err := dao.NewCommentDAO().DeleteCommentByCommentId(u.commentId); err != nil {
 			return err
 		}
-		OneCommentAction.Comment.ID = u.commentId
 	}
-	OneCommentAction.CommentText = u.commentText
 	u.comment = &OneCommentAction
-	fmt.Println(u.comment)
 	return nil
 }
 
 func (u *commentAction) packData() error {
-	//_ = util.FillCommentFields(u.comment)
 	u.Response = &Response{MyComment: u.comment}
 	return nil
 }

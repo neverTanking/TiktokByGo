@@ -2,7 +2,6 @@ package video
 
 import (
 	"errors"
-	"fmt"
 	"github.com/neverTanking/TiktokByGo/cache/Redis"
 	"github.com/neverTanking/TiktokByGo/db"
 	"github.com/neverTanking/TiktokByGo/model"
@@ -68,55 +67,40 @@ func (q *QueryFavorVideoListFlow) prepareData() error {
 		}
 
 		var db_video db.Video
+		var err error
+		var model_userInfo model.User
+		model_userInfo, err = model.SearchUserByID(uint(q.userId))
+		if err != nil {
+			return err
+		}
+		var OneVideo model.Video
+
+		OneVideo, err = model.SearchVideoByID(like.VideoID, model_userInfo)
+		model_userInfo, err = model.SearchUserByID(uint(q.userId))
 		if err := dao.NewVideoDAO().QueryVideoInformationByVideoId(like.VideoID, &db_video); err != nil {
 			return err
 		}
-		//fmt.Println("888888", like.UserID)
-		//查询的是对的
-		//return nil
-		//作者信息查询
-		var OneVideo model.Video
-		OneVideo.Video = db_video
-		var db_userInfo db.User
-		var model_userInfo model.User
-		var err error
-		model_userInfo.FavoriteCount, err = Redis.NewRedisDao().GetUserFavoriteCount(uint(q.userId))
-		if err != nil {
-			return err
-		}
-		model_userInfo.FollowCount = 0
-		model_userInfo.FollowerCount = 0
-		model_userInfo.WorkCount, err = Redis.NewRedisDao().GetUserWorkCount(uint(q.userId))
-		if err != nil {
-			return err
-		}
-
-		model_userInfo.TotalFavorited = "0"
-		err = dao.NewUserInfoDAO().QueryUserInfoById(int64(like.UserID), &db_userInfo)
-		//return nil
 		//更新videos里
 		if err != nil {
 			return err
 		}
-		model_userInfo.User = db_userInfo
-		OneVideo.Author = model_userInfo
-		OneVideo.FavoriteCount, err = Redis.NewRedisDao().GetLikeNumByVideoId(OneVideo.Video.ID)
-		if err != nil { //如果找不到就是0
-			OneVideo.FavoriteCount = 0
-		}
-		OneVideo.CommentCount = 0
+		model_userInfo.FavoriteCount, err = Redis.NewRedisDao().GetUserFavoriteCount(uint(q.userId))
+		model_userInfo.FollowCount = 0
+		model_userInfo.FollowerCount = 0
+		model_userInfo.WorkCount, err = Redis.NewRedisDao().GetUserWorkCount(uint(q.userId))
+		OneVideo.FavoriteCount, err = Redis.NewRedisDao().GetLikeNumByVideoId(OneVideo.Id)
+		OneVideo.CommentCount, err = Redis.NewRedisDao().GetCommentByVideoId(OneVideo.Id)
+
 		OneVideo.IsFavorite = true
+		model_userInfo.TotalFavorited = "0"
+
+		OneVideo.Author = model_userInfo
 
 		q.videos = append(q.videos, &OneVideo)
-
-		fmt.Println(q.videos[0])
 	}
-	//fmt.Println(q.videos)
 	return nil
 }
 func (q *QueryFavorVideoListFlow) packData() error {
 	q.videoList = &FavorList{Videos: q.videos}
-
-	//fmt.Println(q.videoList)
 	return nil
 }

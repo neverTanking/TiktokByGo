@@ -34,14 +34,14 @@ func (u *RedisDao) GetLikeState(userId uint, videoId uint) (bool, error) {
 }
 
 // 根据VideoId查询该视频被点赞的次数
-func (u *RedisDao) GetLikeNumByVideoId(videoId uint) (int64, error) {
+func (u *RedisDao) GetLikeNumByVideoId(videoId uint) (int, error) {
 	strKey := fmt.Sprintf("%s-%d", LIKENUM, videoId)
 	strRes, err := Rdb.Get(ctx, strKey).Result()
 	if err != nil {
 		return 0, err
 	}
 	res, _ := strconv.ParseInt(strRes, 10, 64)
-	return res, nil
+	return int(res), nil
 }
 
 // 给VideoId增加一个赞
@@ -62,7 +62,7 @@ func (u *RedisDao) SubOneLikeNumByVideoId(videoId uint) error {
 	return nil
 }
 
-//给VideoId增加一个评论数
+// 给VideoId增加一个评论数
 func (u *RedisDao) AddOneCommentNumByVideoId(videoId uint) error {
 	strKey := fmt.Sprintf("%s-%d", CommentNum, videoId)
 	if err := Rdb.Incr(ctx, strKey).Err(); err != nil {
@@ -71,7 +71,7 @@ func (u *RedisDao) AddOneCommentNumByVideoId(videoId uint) error {
 	return nil
 }
 
-//给VideoId减少一个评论数
+// 给VideoId减少一个评论数
 func (u *RedisDao) SubOneCommentByVideoId(videoId uint) error {
 	strKey := fmt.Sprintf("%s-%d", CommentNum, videoId)
 	if err := Rdb.Decr(ctx, strKey).Err(); err != nil {
@@ -80,13 +80,13 @@ func (u *RedisDao) SubOneCommentByVideoId(videoId uint) error {
 	return nil
 }
 
-//根据VideoId查询评论数
-func (u *RedisDao) GetCommentByVideoId(videoId uint) (int64, error) {
+// 根据VideoId查询评论数
+func (u *RedisDao) GetCommentByVideoId(videoId uint) (int, error) {
 	strKey := fmt.Sprintf("%s-%d", CommentNum, videoId)
 	strRes, err := Rdb.Get(ctx, strKey).Result()
 	if err != nil {
 		return 0, err
 	}
 	res, _ := strconv.ParseInt(strRes, 10, 64)
-	return res, nil
+	return int(res), nil
 }

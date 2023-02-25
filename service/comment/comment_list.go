@@ -60,11 +60,14 @@ func (u *QueryCommentListFlow) prepareData() error {
 	for i := range db_comments {
 		var comment model.Comment
 		var err error
-		if err = dao.NewUserInfoDAO().QueryUserInfoById(int64(db_comments[i].UserID), &comment.User_.User); err != nil {
+		comment.User_, err = model.SearchUserByID(u.userId)
+		if err != nil {
 			return err
 		}
-		comment.ID = db_comments[i].ID
-		comment.CommentText = db_comments[i].CommentText
+		comment, err = model.SearchCommentByID(db_comments[i].ID, comment.User_, 2)
+		if err != nil {
+			return err
+		}
 		comment.User_.FavoriteCount, err = Redis.NewRedisDao().GetUserFavoriteCount(comment.User_.ID)
 		if err != nil {
 			return err
