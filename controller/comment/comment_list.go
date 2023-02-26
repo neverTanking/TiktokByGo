@@ -3,14 +3,14 @@ package comment
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/neverTanking/TiktokByGo/db"
+	"github.com/neverTanking/TiktokByGo/model"
 	"github.com/neverTanking/TiktokByGo/service/comment"
 	"net/http"
 	"strconv"
 )
 
 type ListResponse struct {
-	db.CommonResponse
+	model.Response
 	*comment.List
 }
 
@@ -60,11 +60,11 @@ func (u *CommentListController) checkNum() error {
 }
 
 func (u *CommentListController) ReturnError(msg string) {
-	u.JSON(http.StatusOK, db.CommonResponse{StatusCode: 1, StatusMsg: msg})
+	u.JSON(http.StatusOK, model.Response{StatusCode: 1, StatusMsg: msg})
 }
 func (u *CommentListController) ReturnSuccess(commentList *comment.List) {
 	u.JSON(http.StatusOK, ListResponse{
-		CommonResponse: db.CommonResponse{StatusCode: 0, StatusMsg: "Success"},
-		List:           commentList,
+		Response: model.Response{StatusCode: 0, StatusMsg: "Success"},
+		List:     commentList,
 	})
 }

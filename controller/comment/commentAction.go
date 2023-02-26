@@ -3,15 +3,15 @@ package comment
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/neverTanking/TiktokByGo/db"
+	"github.com/neverTanking/TiktokByGo/model"
 	"github.com/neverTanking/TiktokByGo/service/comment"
 	"net/http"
 	"strconv"
 )
 
 type commentResponse struct {
-	db.CommonResponse
-	*comment.Response
+	model.Response
+	*comment.Response1
 }
 type commentController struct {
 	*gin.Context
@@ -87,12 +87,12 @@ func (u *commentController) ParseParameter() error {
 
 func (u *commentController) ReturnError(msg string) {
 	u.JSON(http.StatusOK, commentResponse{
-		CommonResponse: db.CommonResponse{StatusCode: 1, StatusMsg: msg}})
+		Response: model.Response{StatusCode: 1, StatusMsg: msg}})
 }
 
-func (u *commentController) ReturnSuccess(comment *comment.Response) {
+func (u *commentController) ReturnSuccess(comment *comment.Response1) {
 	u.JSON(http.StatusOK, commentResponse{
-		CommonResponse: db.CommonResponse{StatusCode: 0, StatusMsg: "success"},
-		Response:       comment,
+		Response:  model.Response{StatusCode: 0, StatusMsg: "success"},
+		Response1: comment,
 	})
 }

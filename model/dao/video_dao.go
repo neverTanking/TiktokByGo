@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"errors"
 	"github.com/neverTanking/TiktokByGo/db"
 	"gorm.io/gorm"
 	"log"
@@ -21,42 +20,6 @@ func NewVideoDAO() *VideoDAO {
 		videoDAO = new(VideoDAO)
 	})
 	return videoDAO
-}
-
-// 查likes表里看看这个UserId喜欢的视频Id
-func (v *VideoDAO) QueryFavorVideoListByUserId(userId int64, Like *[]*db.Like) error {
-	return db.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("user_id = ?", userId).Find(&Like).Error; err != nil {
-			return err
-		}
-		if len(*Like) == 0 {
-			return errors.New("点赞列表为空")
-		}
-		return nil
-	})
-}
-
-// 增加一个赞
-func (u *VideoDAO) AddOneLikeByUserIdAndVideoId(UserId uint, VideoId uint) error {
-	return db.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Create(&db.Like{UserID: UserId, VideoID: VideoId}).Error; err != nil {
-			return err
-		}
-		return nil
-	})
-}
-
-// 减少一个赞
-func (u *VideoDAO) SubOneLikeByUserIdAndVideoId(UserId uint, VideoId uint) error {
-	return db.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Exec("DELETE FROM `likes` WHERE `user_id` = ? AND `video_id` = ?", UserId, VideoId).Error; err != nil {
-			return err
-		}
-		if err := tx.Where("user_id = ? AND video_id = ?", UserId, VideoId).Delete(&db.Like{}).Error; err != nil {
-			return err
-		}
-		return nil
-	})
 }
 
 // 根据videoId查video表所有信息

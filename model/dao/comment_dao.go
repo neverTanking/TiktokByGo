@@ -75,3 +75,14 @@ func (u *CommentDAO) QueryCommentListByVideoId(videoId uint, comments *[]*db.Com
 	}
 	return nil
 }
+
+//videoId查询视频的评论总数
+func (u *CommentDAO) QueryLenCommentByVideoId(videoId uint) (int, error) {
+	var commentList *[]*db.Comment
+	err := db.DB.Where("video_id=?", videoId).Find(&commentList).Error
+	if err != nil || len(*commentList) == 0 {
+		return 0, errors.New("该视频没有评论")
+	}
+	return len(*commentList), nil
+
+}

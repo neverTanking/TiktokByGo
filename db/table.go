@@ -22,8 +22,8 @@ type User struct {
 	BackgroundImage string `json:"background_image"` // 用户个人页顶部大图
 	Signature       string `json:"signature"`        // 个人简介
 
-	Videos []Video `json:"-"`
-	Likes  []Like  `json:"-"`
+	Videos []Video
+	Likes  []Like
 }
 
 type Video struct {
@@ -33,6 +33,6 @@ type Video struct {
 	CoverUrl string `json:"cover_url"`
 	Title    string `json:"title"`
 
-	Likes    []Like    `json:"-"`
-	Comments []Comment `json:"-"`
+	Likes    []Like
+	Comments []Comment
 }

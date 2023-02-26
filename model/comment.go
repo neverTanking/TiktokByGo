@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"github.com/neverTanking/TiktokByGo/db"
 )
@@ -29,4 +30,11 @@ func SearchCommentByID(CommentId uint, User1 User, actionType int) (comment Comm
 		Content:     curComment.CommentText,
 		Create_Date: curComment.CreatedAt.Format("1-2"),
 	}, nil
+}
+
+func FillCommentFields(comment *Comment) error {
+	if comment == nil {
+		return errors.New("FillCommentFields comment 为空")
+	}
+	return nil
 }

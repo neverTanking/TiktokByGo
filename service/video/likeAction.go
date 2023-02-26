@@ -66,15 +66,17 @@ func (u *LikeState) LikeVideo() error {
 	//需要判断这个记录是否已经存在
 	ok, err := Redis.NewRedisDao().GetLikeState(u.UserId, u.VideoId)
 	if err != nil {
-		return err
+		//在Redis中没找到
+		//去数据库中找like表
+		ok = dao.NewLikeDAO().IsLikeByUserIdAndVideoId(u.UserId, u.VideoId)
 	}
 	if ok {
-		//fmt.Println("ERROR666666666!")
 		return errors.New("you can't like again after you've already liked it")
 	}
-	if err := dao.NewVideoDAO().AddOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
+	if err := dao.NewLikeDAO().AddOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
 		return err
 	}
+	//如果不存在会先赋值为0然后加1
 	if err := Redis.NewRedisDao().UpdatePostLike(u.UserId, u.VideoId, true); err != nil {
 		return err
 	}
@@ -89,13 +91,15 @@ func (u *LikeState) LikeVideo() error {
 func (u *LikeState) UnLikeVideo() error {
 	ok, err := Redis.NewRedisDao().GetLikeState(u.UserId, u.VideoId)
 	if err != nil {
-		return err
+		//在Redis中没找到
+		//去数据库中找like表
+		ok = dao.NewLikeDAO().IsLikeByUserIdAndVideoId(u.UserId, u.VideoId)
 	}
 	if !ok {
 		return errors.New("you can't cancel like again after you've already dislike it")
 	}
 
-	if err := dao.NewVideoDAO().SubOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
+	if err := dao.NewLikeDAO().SubOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
 		return err
 	}
 	if err := Redis.NewRedisDao().UpdatePostLike(u.UserId, u.VideoId, false); err != nil {

@@ -51,7 +51,7 @@ func (q *QueryFavorVideoListFlow) checkNum() error {
 func (q *QueryFavorVideoListFlow) prepareData() error {
 	//查likes表里看看这个UserId喜欢的videoId
 	//这边其实可以用Redis-set优化
-	if err := dao.NewVideoDAO().QueryFavorVideoListByUserId(q.userId, &q.likes); err != nil {
+	if err := dao.NewLikeDAO().QueryFavorVideoListByUserId(q.userId, &q.likes); err != nil {
 		return err
 	}
 
@@ -83,12 +83,48 @@ func (q *QueryFavorVideoListFlow) prepareData() error {
 			return err
 		}
 		model_userInfo.FavoriteCount, err = Redis.NewRedisDao().GetUserFavoriteCount(uint(q.userId))
+		if err != nil {
+			cnt, err := dao.NewLikeDAO().QueryLenFavorVideoListByUserId(q.userId)
+			if err != nil {
+				model_userInfo.FavoriteCount = 0
+			} else {
+				model_userInfo.FavoriteCount = int64(cnt)
+			}
+		}
 		model_userInfo.FollowCount = 0
 		model_userInfo.FollowerCount = 0
 		model_userInfo.WorkCount, err = Redis.NewRedisDao().GetUserWorkCount(uint(q.userId))
+		if err != nil {
+			cnt, err := dao.NewUserInfoDAO().QueryLenUserInfoById(q.userId)
+			if err != nil {
+				model_userInfo.WorkCount = 0
+			} else {
+				model_userInfo.WorkCount = int64(cnt)
+				//找到了给Redis设置这个cnt
+				Redis.NewRedisDao().SetUserWorkCount(uint(q.userId), int64(cnt))
+			}
+		}
 		OneVideo.FavoriteCount, err = Redis.NewRedisDao().GetLikeNumByVideoId(OneVideo.Id)
+		if err != nil {
+			cnt, err := dao.NewLikeDAO().QueryLenFavorVideoListByVideoId(int64(OneVideo.Id))
+			if err != nil {
+				OneVideo.FavoriteCount = 0
+			} else {
+				model_userInfo.FavoriteCount = int64(cnt)
+				//找到了给Redis设置这个cnt
+				Redis.NewRedisDao().SetUserFavoriteCount(OneVideo.Id, int64(cnt))
+			}
+		}
 		OneVideo.CommentCount, err = Redis.NewRedisDao().GetCommentByVideoId(OneVideo.Id)
-
+		if err != nil {
+			cnt, err := dao.NewCommentDAO().QueryLenCommentByVideoId(OneVideo.Id)
+			if err != nil {
+				OneVideo.CommentCount = 0
+			} else {
+				OneVideo.CommentCount = cnt
+				Redis.NewRedisDao().SetCommentByVideoId(OneVideo.Id, cnt)
+			}
+		}
 		OneVideo.IsFavorite = true
 		model_userInfo.TotalFavorited = "0"
 

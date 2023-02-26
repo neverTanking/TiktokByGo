@@ -70,10 +70,27 @@ func (u *QueryCommentListFlow) prepareData() error {
 		}
 		comment.User_.FavoriteCount, err = Redis.NewRedisDao().GetUserFavoriteCount(comment.User_.ID)
 		if err != nil {
-			return err
+			cnt, err := dao.NewLikeDAO().QueryLenFavorVideoListByUserId(int64(comment.User_.ID))
+			if err != nil {
+				comment.User_.FavoriteCount = 0
+			} else {
+				comment.User_.FavoriteCount = int64(cnt)
+				//找到了给Redis设置这个值
+				Redis.NewRedisDao().SetUserFavoriteCount(comment.User_.ID, int64(cnt))
+			}
 		}
 		comment.User_.WorkCount, err = Redis.NewRedisDao().GetUserWorkCount(comment.User_.ID)
 		if err != nil {
+			cnt, err := dao.NewUserInfoDAO().QueryLenUserInfoById(int64(comment.User_.ID))
+			if err != nil {
+				comment.User_.WorkCount = 0
+			} else {
+				comment.User_.WorkCount = int64(cnt)
+				//找到了给Redis设置这个值
+				Redis.NewRedisDao().SetUserWorkCount(comment.User_.ID, int64(cnt))
+			}
+		}
+		if err := model.FillCommentFields(&comment); err != nil {
 			return err
 		}
 		u.comments = append(u.comments, &comment)

@@ -1,15 +1,15 @@
 package video
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/neverTanking/TiktokByGo/db"
+	"github.com/neverTanking/TiktokByGo/model"
 	"github.com/neverTanking/TiktokByGo/service/video"
 	"net/http"
+	"strconv"
 )
 
 type FavorVideoListResponse struct {
-	db.CommonResponse
+	model.Response
 	*video.FavorList
 }
 
@@ -43,23 +43,28 @@ func (p *ProxyFavorVideoListController) Do() {
 }
 
 func (p *ProxyFavorVideoListController) parseNum() error {
-	rawUserId, _ := p.Get("UserId")
-	userId, ok := rawUserId.(int64)
-	if !ok {
-		return errors.New("userId解析出错")
+	//rawUserId, _ := p.Get("UserId")
+	//_, ok := rawUserId.(int64)
+	//if !ok {
+	//	return errors.New("token中UserId解析出错")
+	//}
+	strBeSeenUserId := p.Query("user_id")
+	BeSeenUserId, err := strconv.ParseInt(strBeSeenUserId, 10, 64)
+	if err != nil {
+		return err
 	}
-	p.userId = userId
+	p.userId = BeSeenUserId
 	return nil
 }
 
 func (p *ProxyFavorVideoListController) SendError(msg string) {
 	p.JSON(http.StatusOK, FavorVideoListResponse{
-		CommonResponse: db.CommonResponse{StatusCode: 1, StatusMsg: msg}})
+		Response: model.Response{StatusCode: 1, StatusMsg: msg}})
 }
 
 func (p *ProxyFavorVideoListController) SendOk(favorList *video.FavorList) {
 	p.JSON(http.StatusOK, FavorVideoListResponse{
-		CommonResponse: db.CommonResponse{StatusCode: 0, StatusMsg: "success"},
-		FavorList:      favorList,
+		Response:  model.Response{StatusCode: 0, StatusMsg: "success"},
+		FavorList: favorList,
 	})
 }

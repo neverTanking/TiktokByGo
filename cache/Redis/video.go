@@ -1,6 +1,7 @@
 package Redis
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 )
@@ -33,6 +34,15 @@ func (u *RedisDao) GetLikeState(userId uint, videoId uint) (bool, error) {
 	return ok, nil
 }
 
+// 根据VideoId设置该视频被点赞的次数
+func (u *RedisDao) SetLikeNumByVideoId(videoId uint, num int) error {
+	strKey := fmt.Sprintf("%s-%d", LIKENUM, videoId)
+	if err := Rdb.Set(ctx, strKey, num, 0).Err(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // 根据VideoId查询该视频被点赞的次数
 func (u *RedisDao) GetLikeNumByVideoId(videoId uint) (int, error) {
 	strKey := fmt.Sprintf("%s-%d", LIKENUM, videoId)
@@ -56,8 +66,12 @@ func (u *RedisDao) AddOneLikeNumByVideoId(videoId uint) error {
 // 给VideoId减少一个赞
 func (u *RedisDao) SubOneLikeNumByVideoId(videoId uint) error {
 	strKey := fmt.Sprintf("%s-%d", LIKENUM, videoId)
-	if err := Rdb.Decr(ctx, strKey).Err(); err != nil {
+	res, err := Rdb.Decr(ctx, strKey).Result()
+	if err != nil {
 		return err
+	}
+	if res <= -1 {
+		return errors.New("The Key Not Found, You Can't Decrease it")
 	}
 	return nil
 }
@@ -74,8 +88,12 @@ func (u *RedisDao) AddOneCommentNumByVideoId(videoId uint) error {
 // 给VideoId减少一个评论数
 func (u *RedisDao) SubOneCommentByVideoId(videoId uint) error {
 	strKey := fmt.Sprintf("%s-%d", CommentNum, videoId)
-	if err := Rdb.Decr(ctx, strKey).Err(); err != nil {
+	res, err := Rdb.Decr(ctx, strKey).Result()
+	if err != nil {
 		return err
+	}
+	if res <= -1 {
+		return errors.New("The Key Not Found, You Can't Decrease it")
 	}
 	return nil
 }
@@ -89,4 +107,13 @@ func (u *RedisDao) GetCommentByVideoId(videoId uint) (int, error) {
 	}
 	res, _ := strconv.ParseInt(strRes, 10, 64)
 	return int(res), nil
+}
+
+// 根据VideoId设置评论数
+func (u *RedisDao) SetCommentByVideoId(videoId uint, num int) error {
+	strKey := fmt.Sprintf("%s-%d", CommentNum, videoId)
+	if err := Rdb.Set(ctx, strKey, num, 0).Err(); err != nil {
+		return err
+	}
+	return nil
 }

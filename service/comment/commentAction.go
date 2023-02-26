@@ -7,11 +7,11 @@ import (
 	"github.com/neverTanking/TiktokByGo/model/dao"
 )
 
-type Response struct {
+type Response1 struct {
 	MyComment *model.Comment `json:"comment"`
 }
 
-func QueryCommentAction(userId uint, videoId uint, actionType int, commentText string, commentId uint) (*Response, error) {
+func QueryCommentAction(userId uint, videoId uint, actionType int, commentText string, commentId uint) (*Response1, error) {
 	return NewCommentAction(userId, videoId, actionType, commentText, commentId).Finish()
 }
 
@@ -22,7 +22,7 @@ type commentAction struct {
 	commentText string
 	commentId   uint
 
-	*Response
+	*Response1
 	comment *model.Comment
 }
 
@@ -30,7 +30,7 @@ func NewCommentAction(userId uint, videoId uint, actionType int, commentText str
 	return &commentAction{userId: userId, videoId: videoId, actionType: actionType, commentText: commentText, commentId: commentId}
 }
 
-func (u *commentAction) Finish() (*Response, error) {
+func (u *commentAction) Finish() (*Response1, error) {
 	if err := u.checkNum(); err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (u *commentAction) Finish() (*Response, error) {
 	if err := u.packData(); err != nil {
 		return nil, err
 	}
-	return u.Response, nil
+	return u.Response1, nil
 }
 
 func (u *commentAction) checkNum() error {
@@ -63,7 +63,27 @@ func (u *commentAction) prepareData() error {
 		return err
 	}
 	model_userInfo.FavoriteCount, err = Redis.NewRedisDao().GetUserFavoriteCount(u.userId)
+	if err != nil {
+		cnt, err := dao.NewLikeDAO().QueryLenFavorVideoListByUserId(int64(u.userId))
+		if err != nil {
+			model_userInfo.FavoriteCount = 0
+		} else {
+			model_userInfo.FavoriteCount = int64(cnt)
+			//找到了给Redis设置这个值
+			Redis.NewRedisDao().SetUserFavoriteCount(u.userId, int64(cnt))
+		}
+	}
 	model_userInfo.WorkCount, err = Redis.NewRedisDao().GetUserWorkCount(u.userId)
+	if err != nil {
+		cnt, err := dao.NewUserInfoDAO().QueryLenUserInfoById(int64(u.userId))
+		if err != nil {
+			model_userInfo.WorkCount = 0
+		} else {
+			model_userInfo.WorkCount = int64(cnt)
+			//找到了给Redis设置这个值
+			Redis.NewRedisDao().SetUserWorkCount(u.userId, int64(cnt))
+		}
+	}
 	model_userInfo.TotalFavorited = "0"
 	if u.actionType == 1 { //用户插入评论内容
 		if err := dao.NewCommentDAO().InsertCommentByUserIdAndVideoIdAndCommentText(u.userId, u.videoId, u.commentText); err != nil {
@@ -91,6 +111,9 @@ func (u *commentAction) prepareData() error {
 }
 
 func (u *commentAction) packData() error {
-	u.Response = &Response{MyComment: u.comment}
+	if err := model.FillCommentFields(u.comment); err != nil {
+		return err
+	}
+	u.Response1 = &Response1{MyComment: u.comment}
 	return nil
 }
