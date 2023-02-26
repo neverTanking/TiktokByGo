@@ -32,14 +32,12 @@ func (q *QueryFavorVideoListFlow) Do() (*FavorList, error) {
 	if err := q.checkNum(); err != nil {
 		return nil, err
 	}
-	//fmt.Println("Failed6666")
 	if err := q.prepareData(); err != nil {
 		return nil, err
 	}
 	if err := q.packData(); err != nil {
 		return nil, err
 	}
-	//fmt.Println(q.videos)
 	return q.videoList, nil
 }
 

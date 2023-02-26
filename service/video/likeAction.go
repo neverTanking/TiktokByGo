@@ -34,15 +34,6 @@ func (u *LikeState) Finish() error {
 	if err := u.ParameterValid(); err != nil {
 		return err
 	}
-
-	//测试ParameterVaild正确性
-	//正确
-	/*
-		{
-			fmt.Println("6666666666666666", u.UserId, u.VideoId, u.actionType)
-		}
-	*/
-
 	//因为前面已经判断了,只能是LIKE or UNLIKE
 	if u.actionType == LIKE {
 		if err := u.LikeVideo(); err != nil {
