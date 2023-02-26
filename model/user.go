@@ -53,7 +53,7 @@ func SearchUserByID(id uint) (user User, err error) {
 		FavoriteCount:   0,
 		FollowCount:     0,
 		FollowerCount:   0,
-		TotalFavorited:  "",
+		TotalFavorited:  0,
 		WorkCount:       0,
 		IsFollow:        false,
 	}, nil
@@ -77,7 +77,7 @@ func SearchUserByName(username string) (user User, err error) {
 		FavoriteCount:   0,
 		FollowCount:     0,
 		FollowerCount:   0,
-		TotalFavorited:  "",
+		TotalFavorited:  0,
 		WorkCount:       0,
 		IsFollow:        false,
 	}, nil

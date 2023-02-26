@@ -84,7 +84,7 @@ func (u *commentAction) prepareData() error {
 			Redis.NewRedisDao().SetUserWorkCount(u.userId, int64(cnt))
 		}
 	}
-	model_userInfo.TotalFavorited = "0"
+	model_userInfo.TotalFavorited = 0
 	if u.actionType == 1 { //用户插入评论内容
 		if err := dao.NewCommentDAO().InsertCommentByUserIdAndVideoIdAndCommentText(u.userId, u.videoId, u.commentText); err != nil {
 			return err
