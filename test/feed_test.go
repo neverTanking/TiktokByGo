@@ -1,12 +1,83 @@
 package test
 
 import (
+	"fmt"
+	"github.com/neverTanking/TiktokByGo/db"
+	"github.com/neverTanking/TiktokByGo/middleware/JWT"
 	"github.com/neverTanking/TiktokByGo/model"
+	"gorm.io/gorm"
 	"strconv"
 	"testing"
 	"time"
 )
 
+func TestCreateDemoDB(t *testing.T) {
+	db.Init()
+	user1 := db.User{
+		Model:    gorm.Model{},
+		Name:     "user1",
+		Password: "password",
+		Videos:   nil,
+		Likes:    nil,
+	}
+	user2 := db.User{
+		Model:    gorm.Model{},
+		Name:     "user2",
+		Password: "password",
+		Videos:   nil,
+		Likes:    nil,
+	}
+	db.DB.Create(&user1)
+	db.DB.Create(&user2)
+
+	var user = db.User{}
+	db.DB.First(&user)
+
+	video1 := db.Video{
+		Model:    gorm.Model{},
+		UserID:   user.ID,
+		PlayUrl:  "https://1",
+		CoverUrl: "https://1_1",
+		Title:    "Title1",
+	}
+	video2 := db.Video{
+		Model:    gorm.Model{},
+		UserID:   user.ID,
+		PlayUrl:  "https://2",
+		CoverUrl: "https://2_1",
+		Title:    "Title2",
+	}
+	video3 := db.Video{
+		Model:    gorm.Model{},
+		UserID:   user.ID,
+		PlayUrl:  "https://3",
+		CoverUrl: "https://3_1",
+		Title:    "Title3",
+	}
+	db.DB.Create(&video1)
+	db.DB.Create(&video2)
+	db.DB.Create(&video3)
+}
 func TestGetVideoList(t *testing.T) {
-	model.GetVideoList(strconv.FormatInt(time.Now().Unix(), 10), "noToken", 5)
+	db.Init()
+	curUser := db.User{
+		Model:    gorm.Model{},
+		Name:     "user1",
+		Password: "password",
+		Videos:   nil,
+		Likes:    nil,
+	}
+	token, err := JWT.GetToken(curUser.ID, curUser.Name, curUser.Password)
+	if err != nil {
+	}
+	fmt.Println(token)
+	curUserID, ok := JWT.TokenToClaim(token)
+	if ok != false {
+	}
+	model.GetVideoList(strconv.FormatInt(time.Now().Add(time.Minute*-180).Unix(), 10), curUserID.UserId, 5)
+}
+func TestCleanDB(t *testing.T) {
+	db.Init()
+	db.DB.Exec("DELETE FROM videos")
+	db.DB.Exec("DELETE FROM users")
 }
