@@ -29,12 +29,3 @@ type Video struct {
 	CommentCount  int64 `json:"comment_count"`
 	IsFavorite    bool  `json:"is_favorite"`
 }
-
-// 单个视频
-type Video struct {
-	db.Video
-	User                //author信息都在这里面
-	FavoriteCount int64 `json:"favorite_count"`
-	CommentCount  int64 `json:"comment_count"`
-	IsFavorite    bool  `json:"is_favorite"`
-}
