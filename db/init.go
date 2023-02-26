@@ -11,7 +11,10 @@ var DB *gorm.DB
 
 func Init() {
 	var err error
-	DB, err = gorm.Open(mysql.Open(DSN), &gorm.Config{})
+	DB, err = gorm.Open(mysql.Open(DSN), &gorm.Config{
+		SkipDefaultTransaction: true, //关闭默认事务
+		PrepareStmt:            true, //缓存预编译语句
+	})
 	if err != nil {
 		panic(err)
 	}

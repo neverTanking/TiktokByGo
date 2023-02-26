@@ -4,10 +4,10 @@ import "gorm.io/gorm"
 
 type Comment struct {
 	gorm.Model
-	UserID      uint
-	User        User
+	UserID uint
+	//User        User
 	VideoID     uint
-	CommentText string
+	CommentText string `json:"content"`
 }
 type Like struct {
 	gorm.Model
@@ -28,10 +28,10 @@ type User struct {
 
 type Video struct {
 	gorm.Model
-	UserID   uint
-	PlayUrl  string
-	CoverUrl string
-	Title    string
+	UserID   uint   `json:"user_id"`
+	PlayUrl  string `json:"play_url"`
+	CoverUrl string `json:"cover_url"`
+	Title    string `json:"title"`
 
 	Likes    []Like
 	Comments []Comment
