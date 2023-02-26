@@ -126,7 +126,7 @@ func (q *QueryFavorVideoListFlow) prepareData() error {
 			}
 		}
 		OneVideo.IsFavorite = true
-		model_userInfo.TotalFavorited = "0"
+		model_userInfo.TotalFavorited = 0
 
 		OneVideo.Author = model_userInfo
 
