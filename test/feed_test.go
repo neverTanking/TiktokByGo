@@ -1,9 +1,7 @@
 package test
 
 import (
-	"fmt"
 	"github.com/neverTanking/TiktokByGo/db"
-	"github.com/neverTanking/TiktokByGo/middleware/JWT"
 	"github.com/neverTanking/TiktokByGo/model"
 	"gorm.io/gorm"
 	"strconv"
@@ -60,21 +58,12 @@ func TestCreateDemoDB(t *testing.T) {
 }
 func TestGetVideoList(t *testing.T) {
 	db.Init()
-	curUser := db.User{
-		Model:    gorm.Model{},
-		Name:     "user1",
-		Password: "password",
-		Videos:   nil,
-		Likes:    nil,
+	curUser := model.User{
+		ID:   1,
+		Name: "user1",
 	}
-	token, err := JWT.GetToken(curUser.ID, curUser.Name, curUser.Password)
-	if err != nil {
-	}
-	fmt.Println(token)
-	curUserID, ok := JWT.TokenToClaim(token)
-	if ok != false {
-	}
-	model.GetVideoList(strconv.FormatInt(time.Now().Add(time.Minute*-180).Unix(), 10), curUserID.UserId, 5)
+
+	model.GetVideoList(strconv.FormatInt(time.Now().Add(time.Minute*-180).Unix(), 10), curUser, 5)
 }
 func TestCleanDB(t *testing.T) {
 	db.Init()
