@@ -16,12 +16,12 @@ func Init() (*minio.Client, error) { //a
 	endpoint := config.Miniourl
 	accessKeyID := config.MinioaccessKey
 	secretAccessKey := config.MiniosecretKey
-	useSSL := true
+	// useSSL := true
 
 	// Initialize minio client object.
 	minioClient, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
-		Secure: useSSL,
+		Creds: credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
+		// Secure: useSSL,
 	})
 
 	return minioClient, err
