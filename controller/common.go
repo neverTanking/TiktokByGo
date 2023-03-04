@@ -1,6 +1,8 @@
 package controller
 
-import "github.com/neverTanking/TiktokByGo/model"
+import (
+	"github.com/neverTanking/TiktokByGo/model"
+)
 
 type Response struct {
 	StatusCode int32  `json:"status_code"`

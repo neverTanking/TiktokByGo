@@ -1,6 +1,8 @@
 package router
 
 import (
+	"github.com/neverTanking/TiktokByGo/middleware/JWT"
+
 	"github.com/gin-gonic/gin"
 	"github.com/neverTanking/TiktokByGo/controller"
 	"github.com/neverTanking/TiktokByGo/controller/comment"
@@ -17,6 +19,7 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 	apiRouter := r.Group("/douyin")
 
 	// basic apis
+
 	apiRouter.GET("/feed/", controller.Feed)
 	apiRouter.GET("/user/", controller.UserInfo)
 	apiRouter.POST("/user/register/", controller.Register)
@@ -30,6 +33,5 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 
 	apiRouter.POST("/comment/action/", JWT.JWTMiddleware(), comment.CommentActionController)
 	apiRouter.GET("/comment/list/", JWT.JWTMiddleware(), comment.QueryCommentListController)
-
 	return r
 }
