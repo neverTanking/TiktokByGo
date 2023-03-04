@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"errors"
 	"github.com/neverTanking/TiktokByGo/db"
+	"gorm.io/gorm"
 	"log"
 	"sync"
 )
@@ -15,17 +15,6 @@ var (
 	videoOnce sync.Once
 )
 
-func (u *UserInfoDAO) IsUserExistById(id int64) bool {
-	var userinfo db.User
-	if err := db.DB.Where("id=?", id).Select("id").First(&userinfo).Error; err != nil {
-		log.Println(err)
-	}
-	if userinfo.ID == 0 {
-		return false
-	}
-	return true
-}
-
 func NewVideoDAO() *VideoDAO {
 	videoOnce.Do(func() {
 		videoDAO = new(VideoDAO)
@@ -33,17 +22,24 @@ func NewVideoDAO() *VideoDAO {
 	return videoDAO
 }
 
-func (v *VideoDAO) QueryFavorVideoListByUserId(userId int64, videoList *[]*db.Video) error {
-	if videoList == nil {
-		return errors.New("QueryFavorVideoListByUserId videoList 空指针")
+// 根据videoId查video表所有信息
+func (u *VideoDAO) QueryVideoInformationByVideoId(videoId uint, video *db.Video) error {
+	return db.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("id = ?", videoId).First(&video).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+// 根据VideoId查询视频是否存在
+func (u *VideoDAO) IsVideoExistById(id int64) bool {
+	var videoInfo db.Video
+	if err := db.DB.Where("id=?", id).First(&videoInfo).Error; err != nil {
+		log.Println(err)
 	}
-	//多表查询，左连接得到结果，再映射到数据
-	if err := db.DB.Raw("SELECT v.* FROM user_favor_videos u , videos v WHERE u.user_info_id = ? AND u.video_id = v.id", userId).Scan(videoList).Error; err != nil {
-		return err
+	if videoInfo.ID == 0 {
+		return false
 	}
-	//如果id为0，则说明没有查到数据
-	if len(*videoList) == 0 || (*videoList)[0].ID == 0 {
-		return errors.New("点赞列表为空")
-	}
-	return nil
+	return true
 }

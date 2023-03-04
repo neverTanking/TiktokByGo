@@ -6,6 +6,7 @@ const (
 	USERNOTFOUND  = 401
 	TOKENOUT      = 402
 	TOKENNOTRIGHT = 403
+	SUCCESS_MSG   = "Successful"
 )
 
 // Redis

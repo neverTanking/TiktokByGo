@@ -2,6 +2,9 @@
 
 抖音简版——大作业
 
+## 文档
+[NeverTanking青训营后端结业项目答辩汇报文档](https://lgmz502nro.feishu.cn/docx/S9CldZF8MousnmxVSGact5CanCg)
+
 ## 使用
 
 ### 配置数据库
