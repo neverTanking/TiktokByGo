@@ -6,6 +6,7 @@ import (
 	"path"
 	"strconv"
 
+	"github.com/neverTanking/TiktokByGo/model"
 	"github.com/neverTanking/TiktokByGo/service"
 	uuid "github.com/satori/go.uuid"
 
@@ -14,14 +15,15 @@ import (
 
 type VideoListResponse struct {
 	Response
-	VideoList []service.Video `json:"video_list"`
+	VideoList []model.Video `json:"video_list"`
 }
 
 // Publish check token then save upload file to public directory
 func Publish(c *gin.Context) {
 	data, err := c.FormFile("data")
 
-	userId, _ := strconv.ParseInt(c.GetString("userId"), 10, 64)
+	userIdint64, _ := strconv.ParseInt(c.GetString("userId"), 10, 64)
+	userId := uint(userIdint64)
 	log.Printf("获取到用户id:%v\n", userId)
 	title := c.PostForm("title")
 	log.Printf("获取到视频title:%v\n", title)
@@ -72,9 +74,11 @@ func Publish(c *gin.Context) {
 // PublishList /publish/list/
 func PublishList(c *gin.Context) {
 	user_Id, _ := c.GetQuery("user_id")
-	userId, _ := strconv.ParseInt(user_Id, 10, 64)
+	userIdint64, _ := strconv.ParseInt(user_Id, 10, 64)
+	userId := uint(userIdint64)
 	log.Printf("获取到用户id:%v\n", userId)
-	curId, _ := strconv.ParseInt(c.GetString("userId"), 10, 64)
+	curIdint64, _ := strconv.ParseInt(c.GetString("userId"), 10, 64)
+	curId := uint(curIdint64)
 	log.Printf("获取到当前用户id:%v\n", curId)
 
 	list, err := service.List(userId, curId)

@@ -22,7 +22,7 @@ var ()
 
 // minio
 var (
-	Miniourl       = "192.168.199.129:9000"
+	Miniourl       = "192.168.199.129:9000"             //搭建容器地址
 	MinioaccessKey = "62N5uF7SDDD6Bjhq"                 //minioadmin
 	MiniosecretKey = "2z2zqK34guD01OSd2edvm3gR6hZnhdws" //minioadmin //key
 	HeartbeatTime  = 2 * 60

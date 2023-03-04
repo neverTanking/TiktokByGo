@@ -1,10 +1,11 @@
 package router
 
 import (
+	"github.com/neverTanking/TiktokByGo/middleware/JWT"
+
 	"github.com/gin-gonic/gin"
 	"github.com/neverTanking/TiktokByGo/controller"
 	"github.com/neverTanking/TiktokByGo/db"
-	"github.com/neverTanking/TiktokByGo/middleware/JWT"
 )
 
 func InitRouter(r *gin.Engine) *gin.Engine {
