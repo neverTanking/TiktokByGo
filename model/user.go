@@ -37,7 +37,7 @@ func SearchUserByID(id uint) (user User, ok bool) {
 		FavoriteCount:   0,
 		FollowCount:     0,
 		FollowerCount:   0,
-		TotalFavorited:  "",
+		TotalFavorited:  0,
 		WorkCount:       0,
 		IsFollow:        false,
 	}, true
@@ -59,7 +59,7 @@ func SearchUserByName(username string) (user User, ok bool) {
 		FavoriteCount:   0,
 		FollowCount:     0,
 		FollowerCount:   0,
-		TotalFavorited:  "",
+		TotalFavorited:  0,
 		WorkCount:       0,
 		IsFollow:        false,
 	}, true
