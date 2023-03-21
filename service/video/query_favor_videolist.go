@@ -2,7 +2,7 @@ package video
 
 import (
 	"errors"
-	"fmt"
+	"github.com/neverTanking/TiktokByGo/cache/Redis"
 	"github.com/neverTanking/TiktokByGo/db"
 	"github.com/neverTanking/TiktokByGo/model"
 	"github.com/neverTanking/TiktokByGo/model/dao"
@@ -32,7 +32,6 @@ func (q *QueryFavorVideoListFlow) Do() (*FavorList, error) {
 	if err := q.checkNum(); err != nil {
 		return nil, err
 	}
-	//fmt.Println("Failed6666")
 	if err := q.prepareData(); err != nil {
 		return nil, err
 	}
@@ -52,51 +51,86 @@ func (q *QueryFavorVideoListFlow) checkNum() error {
 func (q *QueryFavorVideoListFlow) prepareData() error {
 	//查likes表里看看这个UserId喜欢的videoId
 	//这边其实可以用Redis-set优化
-	if err := dao.NewVideoDAO().QueryFavorVideoListByUserId(q.userId, &q.likes); err != nil {
+	if err := dao.NewLikeDAO().QueryFavorVideoListByUserId(q.userId, &q.likes); err != nil {
 		return err
 	}
-	//fmt.Println("99999999", q.likes[0].VideoID)
-	//return nil
-	//填充信息(Author和IsFavorite字段，由于是点赞列表，故所有的都是点赞状态
-	fmt.Println(len(q.likes))
-	for i := range q.likes {
 
-		fmt.Println(q.likes[i])
+	//填充信息(Author和IsFavorite字段，由于是点赞列表，故所有的都是点赞状态
+	for i := range q.likes {
 		//有了videoId,现在要在videos中查这个视频作者是谁
 		var like db.Like
-		//获取单个video
+		//获取单个videoId
 		if err := dao.NewUserInfoDAO().QueryUserIdByVideoIdInVideos(int64(q.likes[i].VideoID), &like); err != nil {
 			return err
 		}
 
-		//fmt.Println("888888", like.UserID)
-		//查询的是对的
-		//return nil
-		//作者信息查询
-		var OneVideo model.Video
-		var db_userInfo db.User
+		var db_video db.Video
+		var err error
 		var model_userInfo model.User
-		model_userInfo.FavoriteCount = 0
-		model_userInfo.FollowCount = 0
-		model_userInfo.FollowerCount = 0
-		model_userInfo.WorkCount = 0
-		model_userInfo.TotalFavorited = "0"
-		err := dao.NewUserInfoDAO().QueryUserInfoById(int64(like.UserID), &db_userInfo)
-		fmt.Println(db_userInfo)
-		//return nil
+		model_userInfo, err = model.SearchUserByID(uint(q.userId))
+		if err != nil {
+			return err
+		}
+		var OneVideo model.Video
+
+		OneVideo, err = model.SearchVideoByID(like.VideoID, model_userInfo)
+		model_userInfo, err = model.SearchUserByID(uint(q.userId))
+		if err := dao.NewVideoDAO().QueryVideoInformationByVideoId(like.VideoID, &db_video); err != nil {
+			return err
+		}
 		//更新videos里
 		if err != nil {
 			return err
 		}
-		if err == nil { //若查询未出错则更新，否则不更新作者信息
-			OneVideo.User = model_userInfo
+		model_userInfo.FavoriteCount, err = Redis.NewRedisDao().GetUserFavoriteCount(uint(q.userId))
+		if err != nil {
+			cnt, err := dao.NewLikeDAO().QueryLenFavorVideoListByUserId(q.userId)
+			if err != nil {
+				model_userInfo.FavoriteCount = 0
+			} else {
+				model_userInfo.FavoriteCount = int64(cnt)
+			}
 		}
-		OneVideo.FavoriteCount = 0
-		OneVideo.CommentCount = 0
+		model_userInfo.FollowCount = 0
+		model_userInfo.FollowerCount = 0
+		model_userInfo.WorkCount, err = Redis.NewRedisDao().GetUserWorkCount(uint(q.userId))
+		if err != nil {
+			cnt, err := dao.NewUserInfoDAO().QueryLenUserInfoById(q.userId)
+			if err != nil {
+				model_userInfo.WorkCount = 0
+			} else {
+				model_userInfo.WorkCount = int64(cnt)
+				//找到了给Redis设置这个cnt
+				Redis.NewRedisDao().SetUserWorkCount(uint(q.userId), int64(cnt))
+			}
+		}
+		OneVideo.FavoriteCount, err = Redis.NewRedisDao().GetLikeNumByVideoId(OneVideo.Id)
+		if err != nil {
+			cnt, err := dao.NewLikeDAO().QueryLenFavorVideoListByVideoId(int64(OneVideo.Id))
+			if err != nil {
+				OneVideo.FavoriteCount = 0
+			} else {
+				model_userInfo.FavoriteCount = int64(cnt)
+				//找到了给Redis设置这个cnt
+				Redis.NewRedisDao().SetUserFavoriteCount(OneVideo.Id, int64(cnt))
+			}
+		}
+		OneVideo.CommentCount, err = Redis.NewRedisDao().GetCommentByVideoId(OneVideo.Id)
+		if err != nil {
+			cnt, err := dao.NewCommentDAO().QueryLenCommentByVideoId(OneVideo.Id)
+			if err != nil {
+				OneVideo.CommentCount = 0
+			} else {
+				OneVideo.CommentCount = cnt
+				Redis.NewRedisDao().SetCommentByVideoId(OneVideo.Id, cnt)
+			}
+		}
 		OneVideo.IsFavorite = true
+		model_userInfo.TotalFavorited = "0"
+
+		OneVideo.Author = model_userInfo
 
 		q.videos = append(q.videos, &OneVideo)
-
 	}
 	return nil
 }

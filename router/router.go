@@ -3,10 +3,10 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/neverTanking/TiktokByGo/controller"
+	"github.com/neverTanking/TiktokByGo/controller/comment"
 	"github.com/neverTanking/TiktokByGo/controller/video"
 	"github.com/neverTanking/TiktokByGo/db"
 	"github.com/neverTanking/TiktokByGo/middleware/JWT"
-	"github.com/neverTanking/TiktokByGo/middleware/NoAuth"
 )
 
 func InitRouter(r *gin.Engine) *gin.Engine {
@@ -26,20 +26,10 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 
 	// extra apis - I
 	apiRouter.POST("/favorite/action/", JWT.JWTMiddleware(), video.LikeActionController)
-	apiRouter.GET("/favorite/list/", NoAuth.NoAuthMiddleWare(), video.FavoriteListController)
-	//apiRouter.POST("/comment/action/", controller.CommentAction)
-	//apiRouter.GET("/comment/list/", controller.CommentList)
-<<<<<<< HEAD
-	//
-	//// extra apis - II
-	//apiRouter.POST("/relation/action/", controller.RelationAction)
-	//apiRouter.GET("/relation/follow/list/", controller.FollowList)
-	//apiRouter.GET("/relation/follower/list/", controller.FollowerList)
-	//apiRouter.GET("/relation/friend/list/", controller.FriendList)
-	//apiRouter.GET("/message/chat/", controller.MessageChat)
-	//apiRouter.POST("/message/action/", controller.MessageAction)
-=======
+	apiRouter.GET("/favorite/list/", JWT.JWTMiddleware(), video.FavoriteListController)
 
->>>>>>> 1baa5a68629ffb1b0baaa1cd363ace0518dc8406
+	apiRouter.POST("/comment/action/", JWT.JWTMiddleware(), comment.CommentActionController)
+	apiRouter.GET("/comment/list/", JWT.JWTMiddleware(), comment.QueryCommentListController)
+
 	return r
 }

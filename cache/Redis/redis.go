@@ -9,6 +9,8 @@ import (
 )
 
 var (
+	CommentNum    = "commentNum"
+	LIKENUM       = "likeNum"
 	LIKE          = "like"
 	FavoriteCount = "favoriteCount"
 	FollowCount   = "followCount"

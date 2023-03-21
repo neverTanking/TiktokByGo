@@ -34,15 +34,6 @@ func (u *LikeState) Finish() error {
 	if err := u.ParameterValid(); err != nil {
 		return err
 	}
-
-	//测试ParameterVaild正确性
-	//正确
-	/*
-		{
-			fmt.Println("6666666666666666", u.UserId, u.VideoId, u.actionType)
-		}
-	*/
-
 	//因为前面已经判断了,只能是LIKE or UNLIKE
 	if u.actionType == LIKE {
 		if err := u.LikeVideo(); err != nil {
@@ -75,17 +66,22 @@ func (u *LikeState) LikeVideo() error {
 	//需要判断这个记录是否已经存在
 	ok, err := Redis.NewRedisDao().GetLikeState(u.UserId, u.VideoId)
 	if err != nil {
-		return err
+		//在Redis中没找到
+		//去数据库中找like表
+		ok = dao.NewLikeDAO().IsLikeByUserIdAndVideoId(u.UserId, u.VideoId)
 	}
 	if ok {
-		//fmt.Println("ERROR666666666!")
 		return errors.New("you can't like again after you've already liked it")
 	}
-	if err := dao.NewVideoDAO().AddOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
+	if err := dao.NewLikeDAO().AddOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
 		return err
 	}
-
+	//如果不存在会先赋值为0然后加1
 	if err := Redis.NewRedisDao().UpdatePostLike(u.UserId, u.VideoId, true); err != nil {
+		return err
+	}
+	//给视频的喜欢总数加1
+	if err := Redis.NewRedisDao().AddOneLikeNumByVideoId(u.VideoId); err != nil {
 		return err
 	}
 	return nil
@@ -95,16 +91,21 @@ func (u *LikeState) LikeVideo() error {
 func (u *LikeState) UnLikeVideo() error {
 	ok, err := Redis.NewRedisDao().GetLikeState(u.UserId, u.VideoId)
 	if err != nil {
-		return err
+		//在Redis中没找到
+		//去数据库中找like表
+		ok = dao.NewLikeDAO().IsLikeByUserIdAndVideoId(u.UserId, u.VideoId)
 	}
 	if !ok {
 		return errors.New("you can't cancel like again after you've already dislike it")
 	}
 
-	if err := dao.NewVideoDAO().SubOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
+	if err := dao.NewLikeDAO().SubOneLikeByUserIdAndVideoId(u.UserId, u.VideoId); err != nil {
 		return err
 	}
 	if err := Redis.NewRedisDao().UpdatePostLike(u.UserId, u.VideoId, false); err != nil {
+		return err
+	}
+	if err := Redis.NewRedisDao().SubOneLikeNumByVideoId(u.VideoId); err != nil {
 		return err
 	}
 	return err
